@@ -21,8 +21,6 @@ accel_z = 0
 
 
 
-
-
 class lane:
     def __init__(self,x,width):
         self.x=x
@@ -33,54 +31,49 @@ class lane:
 
 
 
-lanes = [
-    [(focal_point,horizon_line),[x,screen_height],[x+road_width,screen_height]],
-    [(focal_point,horizon_line),[x,screen_height],[x-road_width,screen_height]]
-]
-
-
-
+move_right = False
+move_left = False
+current_lane = 0
 
 while not done:
     lanes = [
-        [(focal_point,horizon_line),[x,screen_height],[x+road_width,screen_height]],
-        [(focal_point,horizon_line),[x,screen_height],[x-road_width,screen_height]],
-        [(focal_point,horizon_line),[x+road_width,screen_height],[x+road_width*2,screen_height]],
-        [(focal_point,horizon_line),[x+road_width*2,screen_height],[x+road_width*3,screen_height]],
+        [(focal_point,horizon_line),[x-road_width*2,screen_height],[x-road_width*3,screen_height]],
         [(focal_point,horizon_line),[x-road_width,screen_height],[x-road_width*2,screen_height]],
-        [(focal_point,horizon_line),[x-road_width*2,screen_height],[x-road_width*3,screen_height]]
-        
+        [(focal_point,horizon_line),[x,screen_height],[x-road_width,screen_height]],
+        [(focal_point,horizon_line),[x,screen_height],[x+road_width,screen_height]],
+        [(focal_point,horizon_line),[x+road_width,screen_height],[x+road_width*2,screen_height]],
+        [(focal_point,horizon_line),[x+road_width*2,screen_height],[x+road_width*3,screen_height]]
     ]
+
+    
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             quit()
-        elif event.type == pygame.KEYUP:
+        if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:
-                accel_x = 0
+                current_lane+=1
+                move_right = True
             elif event.key == pygame.K_LEFT:
-                accel_x = 0
+                current_lane-=1
+                move_left = True
+            
 
-    pressed = pygame.key.get_pressed()
-    if pressed[pygame.K_RIGHT]: 
-        accel_x+=0.1
-        x -= 10+accel_x
-    if pressed[pygame.K_LEFT]:
-        accel_x+=0.1
-        x += 10+accel_x
 
+    if move_right==True:
+        x-=800
+        move_right=False
+    elif move_left==True:
+        x+=800
+        move_left=False
+
+
+    print(current_lane)
 
     screen.fill("black")
     for lane in lanes:
         pygame.gfxdraw.filled_polygon(screen,lane,(lane[2][0]%255,lane[1][0]%255,lane[2][0]%255))
-    # pygame.draw.line(screen,"white",(focal_point,horizon_line),(x,screen_height),5)
-    # pygame.draw.line(screen,"white",(focal_point,horizon_line),(x+road_width,screen_height),5)
-    # pygame.draw.line(screen,"white",(focal_point,horizon_line),(x-road_width,screen_height),5)
-    # pygame.draw.line(screen,"white",(focal_point,horizon_line),(x+road_width*2,screen_height),5)
-    # pygame.draw.line(screen,"white",(focal_point,horizon_line),(x-road_width*2,screen_height),5)
-    # pygame.draw.line(screen,"white",(focal_point,horizon_line),(x+road_width*3,screen_height),5)
-    # pygame.draw.line(screen,"white",(focal_point,horizon_line),(x-road_width*3,screen_height),5)
-    # pygame.draw.line(screen,"white",(focal_point,horizon_line),(x+road_width*4,screen_height),5)
-    # pygame.draw.line(screen,"white",(focal_point,horizon_line),(x-road_width*4,screen_height),5)   
+
 
     clock.tick(60)
     pygame.display.update()
