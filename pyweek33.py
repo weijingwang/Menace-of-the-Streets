@@ -1,7 +1,12 @@
 import pygame
 import pygame.gfxdraw
+import os
 
 pygame.init()
+
+
+POV_car = pygame.image.load("./assets/POV_car.png")
+
 done = False
 
 screen_width = 800
@@ -72,14 +77,14 @@ while not done:
             x=next_x
             move_left=False
 
-    print(current_lane,next_x)
+    # print(current_lane,next_x)
 
     # print(current_lane)
 
     screen.fill("black")
     for lane in lanes:
         pygame.gfxdraw.filled_polygon(screen,lane,(lane[2][0]%255,lane[1][0]%255,lane[2][0]%255))
-
+    screen.blit(POV_car,(0,0))
 
     clock.tick(60)
     pygame.display.update()
