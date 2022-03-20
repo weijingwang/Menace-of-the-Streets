@@ -1,3 +1,4 @@
+from doctest import DONT_ACCEPT_BLANKLINE
 import pygame
 import pygame.gfxdraw
 
@@ -15,19 +16,9 @@ screen = pygame.display.set_mode((screen_width,screen_height))
 clock= pygame.time.Clock()
 
 
-x = road_width*4
+x = 0
 accel_x = 0
 accel_z = 0
-
-
-
-class lane:
-    def __init__(self,x,width):
-        self.x=x
-        self.width = width
-    def draw(self):
-        pygame.draw.line(screen,"white",(focal_point,horizon_line),(self.x,screen_height),5)
-        pygame.draw.line(screen,"white",(focal_point,horizon_line),(self.x+road_width,screen_height),5)
 
 
 
@@ -37,14 +28,14 @@ current_lane = 0
 
 while not done:
     lanes = [
-        [(focal_point,horizon_line),[x-road_width*2,screen_height],[x-road_width*4,screen_height]],
-        [(focal_point,horizon_line),[x-road_width*2,screen_height],[x-road_width*3,screen_height]],
-        [(focal_point,horizon_line),[x-road_width,screen_height],[x-road_width*2,screen_height]],
-        [(focal_point,horizon_line),[x,screen_height],[x-road_width,screen_height]],
         [(focal_point,horizon_line),[x,screen_height],[x+road_width,screen_height]],
         [(focal_point,horizon_line),[x+road_width,screen_height],[x+road_width*2,screen_height]],
         [(focal_point,horizon_line),[x+road_width*2,screen_height],[x+road_width*3,screen_height]],
-        [(focal_point,horizon_line),[x+road_width*2,screen_height],[x+road_width*4,screen_height]]
+        [(focal_point,horizon_line),[x+road_width*3,screen_height],[x+road_width*4,screen_height]],
+        [(focal_point,horizon_line),[x+road_width*4,screen_height],[x+road_width*5,screen_height]],
+        [(focal_point,horizon_line),[x+road_width*5,screen_height],[x+road_width*6,screen_height]],
+        [(focal_point,horizon_line),[x+road_width*6,screen_height],[x+road_width*7,screen_height]],
+        [(focal_point,horizon_line),[x+road_width*7,screen_height],[x+road_width*8,screen_height]]
     ]
 
     
@@ -54,20 +45,23 @@ while not done:
             quit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:
-                current_lane+=1
                 move_right = True
             elif event.key == pygame.K_LEFT:
-                current_lane-=1
                 move_left = True
             
 
 
     if move_right==True:
-        x-=800
-        move_right=False
+        if -road_width*current_lane-road_width<=x:
+            print(road_width*current_lane,x,current_lane)
+            x-=10
+        else:
+            move_right=False
+            current_lane-=1
     elif move_left==True:
         x+=800
         move_left=False
+        current_lane+=1
 
 
     print(current_lane)
