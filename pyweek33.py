@@ -3,21 +3,22 @@ import pygame.gfxdraw
 import os
 
 pygame.init()
-
-
-POV_car = pygame.image.load("./assets/POV_car.png")
+screen_width = 640
+screen_height = 360
+screen = pygame.display.set_mode((screen_width,screen_height))
+clock= pygame.time.Clock()
+ 
+POV_car = pygame.image.load("./assets/POV_car.png").convert_alpha()
 
 done = False
 
-screen_width = 800
-screen_height = 600
+
 horizon_line = screen_height/3
 focal_point = screen_width/2
 road_width = screen_width
 
 
-screen = pygame.display.set_mode((screen_width,screen_height))
-clock= pygame.time.Clock()
+
 
 
 x = 0
@@ -30,6 +31,10 @@ move_right = False
 move_left = False
 current_lane = 0
 next_x = current_lane*-road_width
+
+
+# class road
+
 
 while not done:
     lanes = [
@@ -65,14 +70,14 @@ while not done:
 
     if move_right==True:
         if x>=next_x:
-            x-=10
+            x-=screen_width*0.0125
         else:
             x=next_x
             move_right=False
 
     if move_left==True:
         if x<=next_x:
-            x+=10
+            x+=screen_width*0.0125
         else:
             x=next_x
             move_left=False
@@ -84,7 +89,8 @@ while not done:
     screen.fill("black")
     for lane in lanes:
         pygame.gfxdraw.filled_polygon(screen,lane,(lane[2][0]%255,lane[1][0]%255,lane[2][0]%255))
-    screen.blit(POV_car,(0,0))
+
+    screen.blit(pygame.transform.scale(POV_car,(screen_width,screen_height)),(0,0))
 
     clock.tick(60)
     pygame.display.update()
