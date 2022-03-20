@@ -15,7 +15,7 @@ screen = pygame.display.set_mode((screen_width,screen_height))
 clock= pygame.time.Clock()
 
 
-x = 0
+x = road_width*4
 accel_x = 0
 accel_z = 0
 
@@ -37,12 +37,14 @@ current_lane = 0
 
 while not done:
     lanes = [
+        [(focal_point,horizon_line),[x-road_width*2,screen_height],[x-road_width*4,screen_height]],
         [(focal_point,horizon_line),[x-road_width*2,screen_height],[x-road_width*3,screen_height]],
         [(focal_point,horizon_line),[x-road_width,screen_height],[x-road_width*2,screen_height]],
         [(focal_point,horizon_line),[x,screen_height],[x-road_width,screen_height]],
         [(focal_point,horizon_line),[x,screen_height],[x+road_width,screen_height]],
         [(focal_point,horizon_line),[x+road_width,screen_height],[x+road_width*2,screen_height]],
-        [(focal_point,horizon_line),[x+road_width*2,screen_height],[x+road_width*3,screen_height]]
+        [(focal_point,horizon_line),[x+road_width*2,screen_height],[x+road_width*3,screen_height]],
+        [(focal_point,horizon_line),[x+road_width*2,screen_height],[x+road_width*4,screen_height]]
     ]
 
     
