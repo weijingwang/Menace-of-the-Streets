@@ -24,6 +24,7 @@ accel_z = 0
 move_right = False
 move_left = False
 current_lane = 0
+next_x = current_lane*-road_width
 
 while not done:
     lanes = [
@@ -45,22 +46,35 @@ while not done:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:
                 current_lane+=1
+                next_x = current_lane*-road_width
                 move_right = True
             elif event.key == pygame.K_LEFT:
                 current_lane-=1
+                next_x = current_lane*-road_width
                 move_left = True
             
-
+    # if current_lane<0:
+    #     current_lane=0
+    # elif current_lane>7:
+    #     current_lane=7
 
     if move_right==True:
-        x-=800
-        move_right=False
-    elif move_left==True:
-        x+=800
-        move_left=False
+        if x>=next_x:
+            x-=10
+        else:
+            x=next_x
+            move_right=False
 
+    if move_left==True:
+        if x<=next_x:
+            x+=10
+        else:
+            x=next_x
+            move_left=False
 
-    print(current_lane)
+    print(current_lane,next_x)
+
+    # print(current_lane)
 
     screen.fill("black")
     for lane in lanes:
