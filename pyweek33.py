@@ -1,10 +1,11 @@
 import pygame
 import pygame.gfxdraw
 import os
+from random import randrange
 
 pygame.init()
-screen_width = 640
-screen_height = 360
+screen_width = 1280
+screen_height = 720
 screen = pygame.display.set_mode((screen_width,screen_height))
 clock= pygame.time.Clock()
  
@@ -37,6 +38,9 @@ next_x = current_lane*-road_width
 
 
 while not done:
+    random_x = int(randrange(-2,2))
+    random_y = int(randrange(-2,2))
+    print(random_x,random_y)
     lanes = [
         [(focal_point,horizon_line),[x,screen_height],[x+road_width,screen_height]],
         [(focal_point,horizon_line),[x+road_width,screen_height],[x+road_width*2,screen_height]],
@@ -90,7 +94,7 @@ while not done:
     for lane in lanes:
         pygame.gfxdraw.filled_polygon(screen,lane,(lane[2][0]%255,lane[1][0]%255,lane[2][0]%255))
 
-    screen.blit(pygame.transform.scale(POV_car,(screen_width,screen_height)),(0,0))
+    # screen.blit(pygame.transform.scale(POV_car,(screen_width,screen_height)),(0,0))
 
     clock.tick(60)
     pygame.display.update()
