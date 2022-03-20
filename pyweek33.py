@@ -29,6 +29,7 @@ current_lane = 0
 while not done:
     lanes = [
 <<<<<<< HEAD
+<<<<<<< HEAD
         [(focal_point,horizon_line),[x,screen_height],[x+road_width,screen_height]],
         [(focal_point,horizon_line),[x+road_width,screen_height],[x+road_width*2,screen_height]],
         [(focal_point,horizon_line),[x+road_width*2,screen_height],[x+road_width*3,screen_height]],
@@ -38,12 +39,17 @@ while not done:
         [(focal_point,horizon_line),[x+road_width*6,screen_height],[x+road_width*7,screen_height]],
         [(focal_point,horizon_line),[x+road_width*7,screen_height],[x+road_width*8,screen_height]]
 =======
+=======
+>>>>>>> parent of 5761411 (proper order for lanes)
         [(focal_point,horizon_line),[x-road_width*2,screen_height],[x-road_width*3,screen_height]],
         [(focal_point,horizon_line),[x-road_width,screen_height],[x-road_width*2,screen_height]],
         [(focal_point,horizon_line),[x,screen_height],[x-road_width,screen_height]],
         [(focal_point,horizon_line),[x,screen_height],[x+road_width,screen_height]],
         [(focal_point,horizon_line),[x+road_width,screen_height],[x+road_width*2,screen_height]],
         [(focal_point,horizon_line),[x+road_width*2,screen_height],[x+road_width*3,screen_height]]
+<<<<<<< HEAD
+>>>>>>> parent of 5761411 (proper order for lanes)
+=======
 >>>>>>> parent of 5761411 (proper order for lanes)
     ]
 
