@@ -2,7 +2,7 @@ import pygame
 import pygame.gfxdraw
 import os
 from random import randrange
-
+pygame.mixer.pre_init()
 pygame.init()
 screen_width = 1280
 screen_height = 720
@@ -34,13 +34,22 @@ current_lane = 0
 next_x = current_lane*-road_width
 
 
-# class road
+# class road:
+#     def __init__(self,lanes):
+#         self.lanes = lanes
+#         self.move_right=False
+#         self.move_left=False
+#         self.current_lane=0
+#         self.next_x = self.current_lane*-road_width
 
 
-while not done:
-    random_x = int(randrange(-2,2))
-    random_y = int(randrange(-2,2))
-    print(random_x,random_y)
+pygame.mixer.music.load("./assets/i drivin and they hatin.mp3")
+pygame.mixer.music.play(-1,0.0)
+
+while not done: 
+    random_x = int(randrange(-3,3))
+    random_y = int(randrange(-3,3))
+
     lanes = [
         [(focal_point,horizon_line),[x,screen_height],[x+road_width,screen_height]],
         [(focal_point,horizon_line),[x+road_width,screen_height],[x+road_width*2,screen_height]],
@@ -94,7 +103,7 @@ while not done:
     for lane in lanes:
         pygame.gfxdraw.filled_polygon(screen,lane,(lane[2][0]%255,lane[1][0]%255,lane[2][0]%255))
 
-    # screen.blit(pygame.transform.scale(POV_car,(screen_width,screen_height)),(0,0))
+    screen.blit(pygame.transform.scale(POV_car,(screen_width+random_x,screen_height+random_y)),(0,0))
 
     clock.tick(60)
     pygame.display.update()
