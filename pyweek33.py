@@ -4,24 +4,24 @@ import pygame.gfxdraw
 import os
 from random import randrange
 class Obstacle(pygame.sprite.Sprite):
-    def __init__(self) -> None:
+    def __init__(self,width,height) -> None:
         super().__init__()
-        self.width = 300
-        self.height = 300
-        self.image = pygame.transform.scale(pygame.image.load("./assets/car_f.png"), (self.width, self.height))
+        self.width = width
+        self.height = height
+        self.scale = 10
+        self.image = pygame.image.load("./assets/car_f.png").convert_alpha()
+        self.original_image = self.image
         self.rect = self.image.get_rect()
         
     def update(self):
         if self.rect[0]>300:
             self.kill()
-        # self.rect.right+=10
-        # self.rect.bottom+=1
-        self.width+=1
-        self.height+=1
-        print(self.image,self.rect,self.width,self.height)
+
+        self.rect.right+=1
+        self.scale +=1
+        self.image = pygame.transform.scale(self.original_image, (self.scale, self.scale))
+        self.rect = self.image.get_rect(center = self.rect.center)
         
-
-
 
 
 class Game():
@@ -46,9 +46,14 @@ class Game():
         self.next_x = self.current_lane*-self.road_width
         self.screen = screen
 
-        self.test_obst = Obstacle()
+
+        self.test_x = 300
+        self.test_obst = Obstacle(self.test_x,self.test_x)
         self.obstacle_group = pygame.sprite.Group()
         self.obstacle_group.add(self.test_obst)
+
+        self.stars_bg = pygame.image.load("./assets/stars.png").convert_alpha()
+        self.POV_car = pygame.image.load("./assets/POV_car.png").convert_alpha()
 
 
     def update_lane(self):
@@ -81,16 +86,23 @@ class Game():
 
         # print(self.current_lane,self.x,self.next_x)
     def run(self):
+        screen.fill((20,24,82))
+        self.screen.blit(pygame.transform.scale(self.stars_bg,(screen_width,screen_height)),(0,0))
+
+        pygame.draw.rect(self.screen,(14,47,38),(0,240,1280,480))
         # random_x = randrange(-3,3)
         # random_y = randrange(-3,3)
+
         for lane in self.lane_array:
             pygame.gfxdraw.filled_polygon(self.screen,[(self.x0,self.y0),[self.x+self.road_width*lane[0],self.screen_height],[self.x+self.road_width*lane[1],self.screen_height]],lane[2])
         self.screen.blit(pygame.transform.scale(fog,(screen_width,screen_height)),(0,0))
         pygame.draw.rect(self.screen,"black",(0,620,1280,100))
-        self.screen.blit(pygame.transform.scale(POV_car,(screen_width,screen_height)),(0,0))
+        self.screen.blit(pygame.transform.scale(self.POV_car,(screen_width,screen_height)),(0,0))
+
         self.obstacle_group.draw(self.screen)
         self.obstacle_group.update()
 
+        self.test_x+=1
 
 
 
@@ -112,7 +124,11 @@ pygame.mixer.music.play(-1,0.0)
 my_game = Game(4,screen)
 while not done:
     my_game.update_lane()
-    screen.fill("black")
+    
+    
+
+
+    
     my_game.run()
     clock.tick(60)
     pygame.display.update()
