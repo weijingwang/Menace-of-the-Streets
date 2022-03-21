@@ -22,7 +22,7 @@ road_width = screen_width
 
 
 
-x = 0
+x = -5120
 accel_x = 0
 accel_z = 0
 
@@ -30,16 +30,16 @@ accel_z = 0
 
 move_right = False
 move_left = False
-current_lane = 0
+current_lane = 4
 next_x = current_lane*-road_width
 
 
 # class road:
-#     def __init__(self,lanes):
+#     def __init__(self,current_lane,lanes):
 #         self.lanes = lanes
 #         self.move_right=False
 #         self.move_left=False
-#         self.current_lane=0
+#         self.current_lane=current_lane#4
 #         self.next_x = self.current_lane*-road_width
 
 
@@ -56,9 +56,7 @@ while not done:
         [(focal_point,horizon_line),[x+road_width*2,screen_height],[x+road_width*3,screen_height]],
         [(focal_point,horizon_line),[x+road_width*3,screen_height],[x+road_width*4,screen_height]],
         [(focal_point,horizon_line),[x+road_width*4,screen_height],[x+road_width*5,screen_height]],
-        [(focal_point,horizon_line),[x+road_width*5,screen_height],[x+road_width*6,screen_height]],
-        [(focal_point,horizon_line),[x+road_width*6,screen_height],[x+road_width*7,screen_height]],
-        [(focal_point,horizon_line),[x+road_width*7,screen_height],[x+road_width*8,screen_height]]
+        [(focal_point,horizon_line),[x+road_width*5,screen_height],[x+road_width*6,screen_height]]
     ]
 
     
@@ -95,7 +93,7 @@ while not done:
             x=next_x
             move_left=False
 
-    # print(current_lane,next_x)
+    print(current_lane,x,next_x)
 
     # print(current_lane)
 
