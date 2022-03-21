@@ -34,13 +34,51 @@ current_lane = 4
 next_x = current_lane*-road_width
 
 
-# class road:
-#     def __init__(self,current_lane,lanes):
-#         self.lanes = lanes
-#         self.move_right=False
-#         self.move_left=False
-#         self.current_lane=current_lane#4
-#         self.next_x = self.current_lane*-road_width
+class road:
+    def __init__(self,display,current_lane,lanes):
+        self.display = display
+        self.move_right=False
+        self.move_left=False
+        self.current_lane=current_lane#4
+        self.road_width = 800
+        self.screen_width = 1280
+        self.next_x = self.current_lane*-self.road_width
+        self.lanes = lanes
+    def move(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RIGHT:
+                    self.current_lane+=1
+                    self.next_x = self.current_lane*-self.road_width
+                    self.move_right = True
+                elif event.key == pygame.K_LEFT:
+                    self.current_lane-=1
+                    self.next_x = self.current_lane*-self.road_width
+                    self.move_left = True
+        if self.move_right==True:
+            if x>=self.next_x:
+                self.x-=self.screen_width*0.0125
+            else:
+                self.x=self.next_x
+                self.move_right=False
+
+        if self.move_left==True:
+            if x<=self.next_x:
+                x+=self.screen_width*0.0125
+            else:
+                self.x=self.next_x
+                self.move_left=False
+        print(self.current_lane,self.x,self.next_x)
+
+    def draw(self,screen):
+        for lane in self.lanes:
+            pygame.gfxdraw.filled_polygon(screen,lane,(lane[2][0]%255,lane[1][0]%255,lane[2][0]%255))
+
+        # screen.blit(pygame.transform.scale(POV_car,(screen_width+random_x,screen_height+random_y)),(0,0))
+
+
 
 
 pygame.mixer.music.load("./assets/i drivin and they hatin.mp3")
@@ -74,10 +112,6 @@ while not done:
                 next_x = current_lane*-road_width
                 move_left = True
             
-    # if current_lane<0:
-    #     current_lane=0
-    # elif current_lane>7:
-    #     current_lane=7
 
     if move_right==True:
         if x>=next_x:
@@ -95,7 +129,7 @@ while not done:
 
     print(current_lane,x,next_x)
 
-    # print(current_lane)
+
 
     screen.fill("black")
     for lane in lanes:
