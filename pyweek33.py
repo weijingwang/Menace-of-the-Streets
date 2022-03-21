@@ -1,10 +1,27 @@
+from ast import AsyncFunctionDef
 import pygame
 import pygame.gfxdraw
 import os
 from random import randrange
-class Lane():
-    def __init__(self):
+class Obstacle(pygame.sprite.Sprite):
+    def __init__(self) -> None:
         super().__init__()
+        self.width = 300
+        self.height = 300
+        self.image = pygame.transform.scale(pygame.image.load("./assets/car_f.png"), (self.width, self.height))
+        self.rect = self.image.get_rect()
+        
+    def update(self):
+        if self.rect[0]>300:
+            self.kill()
+        # self.rect.right+=10
+        # self.rect.bottom+=1
+        self.width+=1
+        self.height+=1
+        print(self.image,self.rect,self.width,self.height)
+        
+
+
 
 
 class Game():
@@ -28,6 +45,10 @@ class Game():
         self.x = self.current_lane*-self.road_width
         self.next_x = self.current_lane*-self.road_width
         self.screen = screen
+
+        self.test_obst = Obstacle()
+        self.obstacle_group = pygame.sprite.Group()
+        self.obstacle_group.add(self.test_obst)
 
 
     def update_lane(self):
@@ -58,7 +79,7 @@ class Game():
         if self.current_lane==-1 or self.current_lane ==6:
             print("YOU DIE")
 
-        print(self.current_lane,self.x,self.next_x)
+        # print(self.current_lane,self.x,self.next_x)
     def run(self):
         # random_x = randrange(-3,3)
         # random_y = randrange(-3,3)
@@ -67,6 +88,8 @@ class Game():
         self.screen.blit(pygame.transform.scale(fog,(screen_width,screen_height)),(0,0))
         pygame.draw.rect(self.screen,"black",(0,620,1280,100))
         self.screen.blit(pygame.transform.scale(POV_car,(screen_width,screen_height)),(0,0))
+        self.obstacle_group.draw(self.screen)
+        self.obstacle_group.update()
 
 
 
@@ -83,8 +106,8 @@ POV_car = pygame.image.load("./assets/POV_car.png").convert_alpha()
 fog = pygame.image.load("./assets/fog.png").convert_alpha()
 done = False
 
-# pygame.mixer.music.load("./assets/i drivin and they hatin.mp3")
-# pygame.mixer.music.play(-1,0.0)
+pygame.mixer.music.load("./assets/i drivin and they hatin.mp3")
+pygame.mixer.music.play(-1,0.0)
 
 my_game = Game(4,screen)
 while not done:
