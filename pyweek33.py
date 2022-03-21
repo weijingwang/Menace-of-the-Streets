@@ -12,13 +12,16 @@ class Obstacle(pygame.sprite.Sprite):
         self.image = pygame.image.load("./assets/car_f.png").convert_alpha()
         self.original_image = self.image
         self.rect = self.image.get_rect()
+        self.rect.center = 1280/2,720/3
         
     def update(self):
-        if self.rect[0]>300:
-            self.kill()
+        # if self.rect[0]>300:
+        #     self.kill()
 
-        self.rect.right+=1
+        
         self.scale +=1
+        self.rect.right+=1
+        self.rect.bottom+=1
         self.image = pygame.transform.scale(self.original_image, (self.scale, self.scale))
         self.rect = self.image.get_rect(center = self.rect.center)
         
@@ -47,7 +50,7 @@ class Game():
         self.screen = screen
 
 
-        self.test_x = 300
+        self.test_x = 100
         self.test_obst = Obstacle(self.test_x,self.test_x)
         self.obstacle_group = pygame.sprite.Group()
         self.obstacle_group.add(self.test_obst)
@@ -95,14 +98,16 @@ class Game():
 
         for lane in self.lane_array:
             pygame.gfxdraw.filled_polygon(self.screen,[(self.x0,self.y0),[self.x+self.road_width*lane[0],self.screen_height],[self.x+self.road_width*lane[1],self.screen_height]],lane[2])
-        self.screen.blit(pygame.transform.scale(fog,(screen_width,screen_height)),(0,0))
-        pygame.draw.rect(self.screen,"black",(0,620,1280,100))
-        self.screen.blit(pygame.transform.scale(self.POV_car,(screen_width,screen_height)),(0,0))
+        
 
         self.obstacle_group.draw(self.screen)
         self.obstacle_group.update()
 
-        self.test_x+=1
+
+        self.screen.blit(pygame.transform.scale(fog,(screen_width,screen_height)),(0,0))
+        pygame.draw.rect(self.screen,"black",(0,620,1280,100))
+        self.screen.blit(pygame.transform.scale(self.POV_car,(screen_width,screen_height)),(0,0))
+        
 
 
 
