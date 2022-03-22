@@ -109,10 +109,11 @@ class Game():
 
 
         #OBSTACLES
+        self.obstacle_group = pygame.sprite.Group()
         self.test_obst = Obstacle(self.current_lane,self.lane_data,4)
         self.test_obst2 = Obstacle(self.current_lane,self.lane_data,3)
         self.test_obst3 = Obstacle(self.current_lane,self.lane_data,2)
-        self.obstacle_group = pygame.sprite.Group()
+
         self.obstacle_group.add(self.test_obst)
         self.obstacle_group.add(self.test_obst2)
         self.obstacle_group.add(self.test_obst3)
