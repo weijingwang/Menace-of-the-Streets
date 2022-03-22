@@ -20,29 +20,39 @@ class Obstacle(pygame.sprite.Sprite):
         self.pos = [1280/2,720/3]
 
 
-        self.delta_y = 480
-        self.delta_x = lane_data[my_lane][1]-lane_data[my_lane][0]
-        self.speed = 0.0005
+
+        self.speed = 0.00005
 
 
         # self.width = width
         # self.height = height
         
-    def update(self):
+    def update(self,lane_data):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]: self.rect.x+=100
+        if keys[pygame.K_SPACE]:
+            self.pos[1]+=100
         # print(self.rect.x)
         # if self.rect[0]>300:
         #     self.kill()
         # self.scale +=5
         # print(self.lane_data)
         # print(self.delta_x,self.lane_data[0][0])
-        self.pos[0]+=self.delta_x*self.speed
-        self.pos[1]+=self.delta_y*self.speed
+        delta_y = 480
+        delta_x = lane_data[self.my_lane][1]-lane_data[self.my_lane][0]
+        lane_midpoint = delta_x/2+lane_data[self.my_lane][0]
+        # self.pos[0] = (delta_x/2)+lane_data[self.my_lane][1]/(self.pos[1]*delta_y)#!!!!!! THIS IS AT Y=720!!!!
+        self.pos[0]=(lane_midpoint*self.pos[1])/delta_y
+
+        print(lane_data[self.my_lane],lane_midpoint)
+        print(self.pos)
+        self.pos[0]+=delta_x*self.speed
+        self.pos[1]+=delta_y*self.speed
+
+
 
         self.image = pygame.transform.scale(self.original_image, (self.scale, self.scale))
         self.rect = self.image.get_rect(center = self.pos)
-        # print(self.rect.center)
+        # print(lane_data)
 
 
 class Game():
@@ -90,7 +100,7 @@ class Game():
 
 
         #OBSTACLES
-        self.test_obst = Obstacle(self.current_lane,self.lane_data,5)
+        self.test_obst = Obstacle(self.current_lane,self.lane_data,4)
         self.obstacle_group = pygame.sprite.Group()
         self.obstacle_group.add(self.test_obst)
 
@@ -130,7 +140,8 @@ class Game():
             [self.x+self.road_width*self.lane_array[4][0],self.x+self.road_width*self.lane_array[4][1]],
             [self.x+self.road_width*self.lane_array[5][0],self.x+self.road_width*self.lane_array[5][1]]
         ]
-        
+        # print(self.lane_data)
+        self.obstacle_group.update(self.lane_data)
 
         # print(self.lane_data)
     def run(self):
@@ -146,7 +157,7 @@ class Game():
 
 
         self.obstacle_group.draw(self.screen)
-        self.obstacle_group.update()
+        self.obstacle_group.update(self.lane_data)
 
 
         self.screen.blit(pygame.transform.scale(self.fog,(self.screen_width,self.screen_height)),(0,0))
