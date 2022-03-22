@@ -11,7 +11,6 @@ class lane(pygame.sprite.Sprite):
         super().__init__()
         self.display=display
         self.image = pygame.draw.polygon(self.display,(50,100,200),[[10,10],[720,20+x],[720,20+x]])
-        # self.rect = self.image.get_rect()
         self.x=x
         self.y=y  
 
