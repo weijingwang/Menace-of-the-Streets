@@ -4,7 +4,7 @@ import pygame.gfxdraw
 import os
 from random import randrange
 class Obstacle(pygame.sprite.Sprite):
-    def __init__(self) -> None:
+    def __init__(self,lane_left,lane_right) -> None:
         super().__init__()
 
         self.scale = 0
@@ -12,7 +12,10 @@ class Obstacle(pygame.sprite.Sprite):
         self.original_image = self.image
         self.rect = self.image.get_rect()
         self.rect.center = 1280/2,720/3
-        self.route = 0
+
+        self.lane_left = lane_left
+        self.lane_right = lane_right
+
 
         # self.width = width
         # self.height = height
@@ -22,8 +25,8 @@ class Obstacle(pygame.sprite.Sprite):
         #     self.kill()
 
         
-        self.scale +=5
-        self.rect.right+=1
+        # self.scale +=5
+        # self.rect.right+=(720-(720/3)/(self.rect[1]*(self.lane_left,self.lane_right)))
         self.rect.bottom+=1
         self.image = pygame.transform.scale(self.original_image, (self.scale, self.scale))
         self.rect = self.image.get_rect(center = self.rect.center)
@@ -58,7 +61,7 @@ class Game():
         self.x = self.current_lane*-self.road_width
         self.next_x = self.current_lane*-self.road_width
         #OBSTACLES
-        self.test_obst = Obstacle()
+        self.test_obst = Obstacle(0,0)
         self.obstacle_group = pygame.sprite.Group()
         self.obstacle_group.add(self.test_obst)
 
@@ -100,8 +103,7 @@ class Game():
         # random_y = randrange(-3,3)
 
         for lane in self.lane_array:
-            pygame.gfxdraw.filled_polygon(self.screen,[(self.x0,self.y0),[self.x+self.road_width*lane[0],self.screen_height],[self.x+self.road_width*lane[1],self.screen_height]],lane[2])
-        
+             poo=pygame.gfxdraw.filled_polygon(self.screen,[(self.x0,self.y0),[self.x+self.road_width*lane[0],self.screen_height],[self.x+self.road_width*lane[1],self.screen_height]],lane[2])
 
         self.obstacle_group.draw(self.screen)
         self.obstacle_group.update()
