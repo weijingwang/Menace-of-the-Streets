@@ -7,18 +7,17 @@ class Obstacle(pygame.sprite.Sprite):
     def __init__(self,current_lane,lane_data,my_lane) -> None:
         super().__init__()
 
-        self.scale = 100
+        self.scale = 0
         self.image = pygame.image.load("./assets/car_f.png").convert_alpha()
         self.original_image = self.image
         self.rect = self.image.get_rect()
-        self.rect.center = 1280/2,720/3
+        self.rect.midbottom = 1280/2,720/3
 
         self.current_lane = current_lane
         self.lane_data = lane_data
         self.my_lane = my_lane
 
         self.pos = [1280/2,720/3]
-
 
 
         self.speed = 0.0005
@@ -58,10 +57,10 @@ class Obstacle(pygame.sprite.Sprite):
         new_xR = (1280/2)-delta_x_nowR
         obst_width = abs(new_xL-new_xR)
         # print(obst_width)
-        self.scale =int(obst_width)*2
+        self.scale =int(obst_width)
 
-        self.image = pygame.transform.scale(self.original_image, (self.scale, self.scale))
-        self.rect = self.image.get_rect(center = self.pos)
+        self.image = pygame.transform.scale(self.original_image, (self.scale, int(self.scale/2)))
+        self.rect = self.image.get_rect(midbottom = self.pos)
         print(self.rect)
 
 
