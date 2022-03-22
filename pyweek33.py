@@ -29,30 +29,27 @@ class Obstacle(pygame.sprite.Sprite):
         
     def update(self,lane_data):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            self.pos[1]+=100
+        # if keys[pygame.K_SPACE]:
+        #     self.pos[1]+=100
         # print(self.rect.x)
         # if self.rect[0]>300:
         #     self.kill()
         # self.scale +=5
-        # print(self.lane_data)
-        # print(self.delta_x,self.lane_data[0][0])
-        delta_y = 480
-        delta_x = lane_data[self.my_lane][1]-lane_data[self.my_lane][0]
-        lane_midpoint = delta_x/2+lane_data[self.my_lane][0]
-        # self.pos[0] = (delta_x/2)+lane_data[self.my_lane][1]/(self.pos[1]*delta_y)#!!!!!! THIS IS AT Y=720!!!!
-        self.pos[0]=(lane_midpoint*self.pos[1])/delta_y
 
-        print(lane_data[self.my_lane],lane_midpoint)
-        print(self.pos)
-        self.pos[0]+=delta_x*self.speed
-        self.pos[1]+=delta_y*self.speed
+        delta_y_f = 240-720
+        delta_x_f = (1280/2)-(((lane_data[self.my_lane][1]-lane_data[self.my_lane][0])/2)+lane_data[self.my_lane][0])
+        delta_ratio = delta_x_f/delta_y_f
+        delta_y_now = 240-self.pos[1]
+        delta_x_now = delta_y_now*delta_ratio
+        new_x = (1280/2)-delta_x_now
+        self.pos[1]-=delta_y_f*self.speed
+        self.pos[0]=new_x
 
 
 
         self.image = pygame.transform.scale(self.original_image, (self.scale, self.scale))
         self.rect = self.image.get_rect(center = self.pos)
-        # print(lane_data)
+        print(self.pos)
 
 
 class Game():
