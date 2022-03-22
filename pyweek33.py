@@ -20,8 +20,9 @@ class Obstacle(pygame.sprite.Sprite):
         self.pos = [1280/2,720/3]
 
 
-        self.y_speed = 1
-        self.x_speed = 0
+        self.delta_y = 480
+        self.delta_x = lane_data[my_lane][1]-lane_data[my_lane][0]
+        self.speed = 0.0005
 
 
         # self.width = width
@@ -33,8 +34,8 @@ class Obstacle(pygame.sprite.Sprite):
 
         
         # self.scale +=5
-        self.pos[0]+=???
-        self.pos[1]+=self.y_speed
+        self.pos[0]+=self.delta_x*self.speed
+        self.pos[1]+=self.delta_y*self.speed
 
         self.image = pygame.transform.scale(self.original_image, (self.scale, self.scale))
         self.rect = self.image.get_rect(center = self.pos)
@@ -82,11 +83,11 @@ class Game():
             [self.x+self.road_width*self.lane_array[4][0],self.x+self.road_width*self.lane_array[4][1]],
             [self.x+self.road_width*self.lane_array[5][0],self.x+self.road_width*self.lane_array[5][1]]
         ]
-        # print(self.lane_data)
+        print(self.lane_data)
 
 
         #OBSTACLES
-        self.test_obst = Obstacle(self.current_lane,self.lane_data,4)
+        self.test_obst = Obstacle(self.current_lane,self.lane_data,5)
         self.obstacle_group = pygame.sprite.Group()
         self.obstacle_group.add(self.test_obst)
 
@@ -158,8 +159,8 @@ screen_height = 720
 screen = pygame.display.set_mode((screen_width,screen_height))
 clock= pygame.time.Clock()
 done = False
-pygame.mixer.music.load("./assets/i drivin and they hatin.mp3")
-pygame.mixer.music.play(-1,0.0)
+# pygame.mixer.music.load("./assets/i drivin and they hatin.mp3")
+# pygame.mixer.music.play(-1,0.0)
 
 my_game = Game(4,screen)
 while not done:
