@@ -29,6 +29,9 @@ class Obstacle(pygame.sprite.Sprite):
         # self.height = height
         
     def update(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]: self.rect.x+=100
+        # print(self.rect.x)
         # if self.rect[0]>300:
         #     self.kill()
         # self.scale +=5
@@ -92,7 +95,6 @@ class Game():
         self.obstacle_group.add(self.test_obst)
 
     def update_lane(self):
-        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
@@ -128,6 +130,8 @@ class Game():
             [self.x+self.road_width*self.lane_array[4][0],self.x+self.road_width*self.lane_array[4][1]],
             [self.x+self.road_width*self.lane_array[5][0],self.x+self.road_width*self.lane_array[5][1]]
         ]
+        
+
         # print(self.lane_data)
     def run(self):
         screen.fill((20,24,82))
@@ -139,6 +143,7 @@ class Game():
 
         for lane in self.lane_array:
             pygame.gfxdraw.filled_polygon(self.screen,[(self.x0,self.y0),[self.x+self.road_width*lane[0],self.screen_height],[self.x+self.road_width*lane[1],self.screen_height]],lane[2])
+
 
         self.obstacle_group.draw(self.screen)
         self.obstacle_group.update()
