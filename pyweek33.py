@@ -4,7 +4,7 @@ import pygame.gfxdraw
 import os
 from random import randrange
 class Obstacle(pygame.sprite.Sprite):
-    def __init__(self,lane_left,lane_right) -> None:
+    def __init__(self,lane_data) -> None:
         super().__init__()
 
         self.scale = 0
@@ -13,8 +13,7 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = 1280/2,720/3
 
-        self.lane_left = lane_left
-        self.lane_right = lane_right
+        self.lane_data = lane_data
 
 
         # self.width = width
@@ -63,19 +62,22 @@ class Game():
             [4,5,(165,165,165)],
             [5,6,(198,248,198)]
         ]
+
+
         # pygame.gfxdraw.filled_polygon(self.screen,[(self.x0,self.y0),[self.x+self.road_width*lane[0],self.screen_height],[self.x+self.road_width*lane[1],self.screen_height]],lane[2])
-        # self.lane_data = [
-        #     [self.x+self.road_width*self.lane_array[0][0],self.x+self.road_width*self.lane_array[0][1]],
-        #     [self.x+self.road_width*self.lane_array[1][0],self.x+self.road_width*self.lane_array[1][1]]
-        #     [self.x+self.road_width*self.lane_array[2][0],self.x+self.road_width*self.lane_array[2][1]],
-        #     [self.x+self.road_width*self.lane_array[3][0],self.x+self.road_width*self.lane_array[3][1]],
-        #     [self.x+self.road_width*self.lane_array[4][0],self.x+self.road_width*self.lane_array[4][1]],
-        #     [self.x+self.road_width*self.lane_array[5][0],self.x+self.road_width*self.lane_array[5][1]]
-        # ]
+        self.lane_data = [
+            [self.x+self.road_width*self.lane_array[0][0],self.x+self.road_width*self.lane_array[0][1]],
+            [self.x+self.road_width*self.lane_array[1][0],self.x+self.road_width*self.lane_array[1][1]],
+            [self.x+self.road_width*self.lane_array[2][0],self.x+self.road_width*self.lane_array[2][1]],
+            [self.x+self.road_width*self.lane_array[3][0],self.x+self.road_width*self.lane_array[3][1]],
+            [self.x+self.road_width*self.lane_array[4][0],self.x+self.road_width*self.lane_array[4][1]],
+            [self.x+self.road_width*self.lane_array[5][0],self.x+self.road_width*self.lane_array[5][1]]
+        ]
+        print(self.lane_data)
 
 
         #OBSTACLES
-        self.test_obst = Obstacle(0,0)
+        self.test_obst = Obstacle(self.lane_data)
         self.obstacle_group = pygame.sprite.Group()
         self.obstacle_group.add(self.test_obst)
 
@@ -107,8 +109,15 @@ class Game():
         if self.current_lane==-1 or self.current_lane ==6:
             print("YOU DIE")
         # print(self.lane_data)
-
-        # print(self.current_lane,self.x,self.next_x)
+        self.lane_data = [
+            [self.x+self.road_width*self.lane_array[0][0],self.x+self.road_width*self.lane_array[0][1]],
+            [self.x+self.road_width*self.lane_array[1][0],self.x+self.road_width*self.lane_array[1][1]],
+            [self.x+self.road_width*self.lane_array[2][0],self.x+self.road_width*self.lane_array[2][1]],
+            [self.x+self.road_width*self.lane_array[3][0],self.x+self.road_width*self.lane_array[3][1]],
+            [self.x+self.road_width*self.lane_array[4][0],self.x+self.road_width*self.lane_array[4][1]],
+            [self.x+self.road_width*self.lane_array[5][0],self.x+self.road_width*self.lane_array[5][1]]
+        ]
+        print(self.lane_data)
     def run(self):
         screen.fill((20,24,82))
         self.screen.blit(pygame.transform.scale(self.stars_bg,(screen_width,screen_height)),(0,0))
