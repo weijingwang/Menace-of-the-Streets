@@ -69,7 +69,8 @@ class Obstacle(pygame.sprite.Sprite):
         self.pos = [1280/2,720/3]
 
 
-        self.speed =0.2
+        self.speed =0.0001
+        self.accel = 0.005
         # self.z = z
 
 
@@ -77,7 +78,7 @@ class Obstacle(pygame.sprite.Sprite):
         # self.height = height
         
     def update(self,lane_data):
-        print(self.my_lane)
+        # print(self.my_lane)
         if self.scale>800:
             self.kill()
 
@@ -90,6 +91,7 @@ class Obstacle(pygame.sprite.Sprite):
         new_x = (1280/2)-delta_x_now
         #MOVE CAR HERE
         self.pos[1]+=self.speed
+        self.speed+=self.accel
         self.pos[0]=new_x
 
         delta_x_fL = (1280/2)-lane_data[self.my_lane][0]
@@ -159,8 +161,9 @@ class Game():
 
 
         #OBSTACLES
-        self.obstacle_group = pygame.sprite.Group()
-
+        self.house_group = pygame.sprite.Group()
+        self.car_f_group = pygame.sprite.Group()
+        self.car_b_group = pygame.sprite.Group()
         # self.my_backgroundL = Background(5,"left",1280/2)
         # self.my_backgroundR = Background(5,"right",1280/2)
         # self.my_backgroundL2 = Background(5,"right",0)
@@ -216,7 +219,7 @@ class Game():
             [self.x+self.road_width*self.lane_array[5][0],self.x+self.road_width*self.lane_array[5][1]]
         ]
         # print(self.lane_data)
-        self.obstacle_group.update(self.lane_data)
+
 
         # print(self.lane_data)
     def run(self):
@@ -233,14 +236,17 @@ class Game():
         for lane in self.lane_array:
             pygame.gfxdraw.filled_polygon(self.screen,[(self.x0,self.y0),[self.x+self.road_width*lane[0],self.screen_height],[self.x+self.road_width*lane[1],self.screen_height]],lane[2])
 
-
-        self.obstacle_group.draw(self.screen)
-        self.obstacle_group.update(self.lane_data)
+        self.house_group.draw(self.screen)
+        self.car_f_group.draw(self.screen)
+        self.car_b_group.draw(self.screen)
+        self.house_group.update(self.lane_data)
+        self.car_f_group.update(self.lane_data)
+        self.car_b_group.update(self.lane_data)
 
 
         self.screen.blit(pygame.transform.scale(self.fog,(self.screen_width,self.screen_height)),(0,0))
-        self.screen.blit(pygame.transform.scale(self.evil_twin,(int(self.screen_width/2),self.screen_height)),(0,0))
-        self.screen.blit(pygame.transform.scale(self.mayor_twin,(int(self.screen_width/2),self.screen_height)),(int(self.screen_width/2),0))
+        # self.screen.blit(pygame.transform.scale(self.evil_twin,(int(self.screen_width/2),self.screen_height)),(0,0))
+        # self.screen.blit(pygame.transform.scale(self.mayor_twin,(int(self.screen_width/2),self.screen_height)),(int(self.screen_width/2),0))
 
         pygame.draw.rect(self.screen,"black",(0,620,1280,100))
         self.screen.blit(pygame.transform.scale(self.image,(screen_width,screen_height)),(0,0))
@@ -251,14 +257,21 @@ class Game():
             self.z+=1
 
     def spawn_obstacles(self):
-        
-        if self.z>=40:
+        current_obstacles = len(self.house_group)+len(self.car_f_group)+len(self.car_b_group)
+        if current_obstacles<10:
             choose_type = random.choice(["car_b","car_f","house"])
-            test = Obstacle(self.current_lane,self.lane_data,choose_type)
-            self.obstacle_group.add(test)     
-            self.z=0
+            for x in range(0,10-current_obstacles):
+                test = Obstacle(self.current_lane,self.lane_data,choose_type)
+                if choose_type == "house":
+                    self.house_group.add(test)
+                elif choose_type == "car_f":
+                    self.car_f_group.add(test) 
+                elif choose_type == "car_b":
+                    self.car_b_group.add(test)      
+        self.z=0
 
-        print(self.z)
+        # print(self.z)
+        print(current_obstacles)
                 
 
 
@@ -277,7 +290,7 @@ bob=pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
 bob=pygame.mixer.music.load("./assets/music/before the disaster.mp3")
 pygame.mixer.music.play(-1,0.0)
 pygame.mixer.music.set_volume(1)
-print(bob)
+# print(bob)
 my_game = Game(4,screen)
 while not done:
     my_game.move_player()
