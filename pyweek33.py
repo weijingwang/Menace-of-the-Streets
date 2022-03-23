@@ -31,11 +31,33 @@ class Background(pygame.sprite.Sprite):
         
 
 class Obstacle(pygame.sprite.Sprite):
-    def __init__(self,current_lane,lane_data,my_lane,z) -> None:
+    def __init__(self,current_lane,lane_data,type) -> None:
         super().__init__()
 
+        self.image_link = None
+        self.type = type
+
+        self.height_multiplier = 0
+
+        if self.type == "car_f":
+            self.image_link = "./assets/car_f.png"
+            self.my_lane = random.randrange(3,5)
+            self.height_multiplier = 0.5
+
+        elif self.type == "car_b":
+            self.image_link = "./assets/car_b.png"
+            self.my_lane = random.randrange(1,3)
+            self.height_multiplier = 0.5
+
+        elif self.type == "house":
+            self.image_link = "./assets/house_off.png"
+            self.my_lane = random.choice((0,5))
+            self.height_multiplier = 3
+
+        self.image = pygame.image.load("./assets/car_b.png").convert_alpha()
+
         self.scale = 0
-        self.image = pygame.image.load("./assets/car_f.png").convert_alpha()
+        self.image = pygame.image.load(self.image_link).convert_alpha()
         self.original_image = self.image
         self.image = pygame.transform.scale(self.original_image, (0, 0))
         self.rect = self.image.get_rect()
@@ -43,23 +65,19 @@ class Obstacle(pygame.sprite.Sprite):
 
         self.current_lane = current_lane
         self.lane_data = lane_data
-        self.my_lane = my_lane
 
         self.pos = [1280/2,720/3]
 
 
         self.speed =0.2
-        self.z = z
+        # self.z = z
 
 
         # self.width = width
         # self.height = height
         
     def update(self,lane_data):
-        keys = pygame.key.get_pressed()
-        # if keys[pygame.K_SPACE]:
-        #     self.pos[1]+=100
-        # print(self.rect.x)
+        print(self.my_lane)
         if self.scale>800:
             self.kill()
 
@@ -74,25 +92,19 @@ class Obstacle(pygame.sprite.Sprite):
         self.pos[1]+=self.speed
         self.pos[0]=new_x
 
-
-        delta_y_fO = 240-720
         delta_x_fL = (1280/2)-lane_data[self.my_lane][0]
         delta_x_fR = (1280/2)-lane_data[self.my_lane][1]
         delta_ratioL = delta_x_fL/delta_y_f
         delta_ratioR = delta_x_fR/delta_y_f
-        delta_y_nowO = 240-self.pos[1]
         delta_x_nowL = delta_y_now*delta_ratioL
         delta_x_nowR = delta_y_now*delta_ratioR
         new_xL = (1280/2)-delta_x_nowL
         new_xR = (1280/2)-delta_x_nowR
         obst_width = abs(new_xL-new_xR)
-        # print(obst_width)
         self.scale =int(obst_width)
 
-        self.image = pygame.transform.scale(self.original_image, (self.scale, int(self.scale/2)))
+        self.image = pygame.transform.scale(self.original_image, (self.scale, int(self.scale*self.height_multiplier)))
         self.rect = self.image.get_rect(midbottom = self.pos)
-        # print(self.rect)
-
 
 class Game():
     def __init__(self,current_lane,screen):
@@ -233,20 +245,13 @@ class Game():
             self.z+=1
 
     def spawn_obstacles(self):
-        enemy_count=random.randrange(0,3)
-        house_count = random.randrange(0,3)
         
-        # if self.z>=40:
-        #     for x in range(0,enemy_count):
-        #         x = Obstacle(self.current_lane,self.lane_data,random.randrange(1,5),self.z)
-        #         self.obstacle_group.add(x)     
-        #     self.z=0
-        self.z+=0.01
         if self.z>=40:
-            for x in range(0,house_count):
-                x = Obstacle(self.current_lane,self.lane_data,random.choice([0,5]),self.z)
-                self.obstacle_group.add(x)
+            choose_type = random.choice(["car_b","car_f","house"])
+            test = Obstacle(self.current_lane,self.lane_data,choose_type)
+            self.obstacle_group.add(test)     
             self.z=0
+
         print(self.z)
                 
 
