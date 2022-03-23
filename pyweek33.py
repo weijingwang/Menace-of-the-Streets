@@ -1,35 +1,41 @@
-
 import pygame
 import pygame.gfxdraw
 import os
 import random
 
-class Background():
-	def __init__(self,scroll_speed):
-		self.x=1280/2
-		self.y=720/3
-		self.scroll_speed = scroll_speed
-		self.image =pygame.image.load("./assets/cityback.png").convert_alpha()
-		self.rect = self.image.get_rect()
-		self.scroll_speed_bank = scroll_speed
+class Background(pygame.sprite.Sprite):
+    def __init__(self,scroll_speed,direction,x):
+        super().__init__()
+        self.x = x
+        self.pos =[self.x,720/3]
+        self.scroll_speed = scroll_speed
+        self.image =pygame.image.load("./assets/cityback.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image,(int(1280/2),int(720/4)))
+        self.rect = self.image.get_rect()
+        self.rect.midbottom = self.pos
+        self.direction = direction
+        
 
-		
-	def draw(self,screen):
+    def update(self):
+        if self.direction == "right":
+            self.pos[0]+=self.scroll_speed
+            if self.pos[0]>1280:
+                self.pos[0]=self.x
+            self.rect = self.image.get_rect(midbottom = self.pos)
+        if self.direction =="left":
+            self.pos[0]-=self.scroll_speed
+            if self.pos[0]<0:
+                self.pos[0]=self.x
+            self.rect = self.image.get_rect(midbottom = self.pos)
 
-		self.x-=self.scroll_speed
-
-		if self.x<=-1280:
-			self.x=1280
-
-		screen.blit(pygame.transform.scale(self.image,(1280,240)),(self.x,self.y))
-
+        
 
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self,current_lane,lane_data,my_lane,z) -> None:
         super().__init__()
 
         self.scale = 0
-        self.image = pygame.image.load("./assets/house_off.png").convert_alpha()
+        self.image = pygame.image.load("./assets/car_f.png").convert_alpha()
         self.original_image = self.image
         self.rect = self.image.get_rect()
         self.rect.midbottom = 1280/2,720/3
@@ -82,7 +88,7 @@ class Obstacle(pygame.sprite.Sprite):
         # print(obst_width)
         self.scale =int(obst_width)
 
-        self.image = pygame.transform.scale(self.original_image, (self.scale, int(self.scale*3)))
+        self.image = pygame.transform.scale(self.original_image, (self.scale, int(self.scale/2)))
         self.rect = self.image.get_rect(midbottom = self.pos)
         # print(self.rect)
 
@@ -139,19 +145,29 @@ class Game():
         #OBSTACLES
         self.obstacle_group = pygame.sprite.Group()
 
-        self.my_background = Background(10)
+        # self.my_backgroundL = Background(5,"left",1280/2)
+        # self.my_backgroundR = Background(5,"right",1280/2)
+        # self.my_backgroundL2 = Background(5,"right",0)
+        # self.my_backgroundR2 = Background(5,"left",1280)
+
+        self.background_group = pygame.sprite.Group()
+        # self.background_group.add(self.my_backgroundL)
+        # self.background_group.add(self.my_backgroundR)
+        # self.background_group.add(self.my_backgroundL2)
+        # self.background_group.add(self.my_backgroundR2)
+
 
     def update_lane(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_RIGHT and self.move_left == False:
                     self.image=self.POV_car_R
                     self.current_lane+=1
                     self.next_x = self.current_lane*-self.road_width
                     self.move_right = True
-                elif event.key == pygame.K_LEFT:
+                elif event.key == pygame.K_LEFT and self.move_right == False:
                     self.image=self.POV_car_L
                     self.current_lane-=1
                     self.next_x = self.current_lane*-self.road_width
@@ -162,13 +178,13 @@ class Game():
 
         if self.move_right==True:
             if self.x>=self.next_x:
-                self.x-=self.screen_width*0.0125
+                self.x-=self.screen_width*0.05#0.0125
             else:
                 self.x=self.next_x
                 self.move_right=False
         if self.move_left==True:
             if self.x<=self.next_x:
-                self.x+=self.screen_width*0.0125
+                self.x+=self.screen_width*0.05
             else:
                 self.x=self.next_x
                 self.move_left=False
@@ -193,7 +209,8 @@ class Game():
 
         pygame.draw.rect(self.screen,(14,47,38),(0,240,1280,480))
         # self.screen.blit(pygame.transform.scale(self.cityback,(screen_width,screen_height)),(0,0))
-        self.my_background.draw(self.screen)
+        self.background_group.draw(self.screen)
+        self.background_group.update()
         # random_x = randrange(-3,3)
         # random_y = randrange(-3,3)
 
@@ -245,7 +262,7 @@ screen = pygame.display.set_mode((screen_width,screen_height))
 clock= pygame.time.Clock()
 done = False
 bob=pygame.mixer.music.load("./assets/i drivin and they hatin.mp3")
-bob=pygame.mixer.music.load("./assets/menace of the streets.mp3")
+# bob=pygame.mixer.music.load("./assets/menace of the streets.mp3")
 pygame.mixer.music.play(-1,0.0)
 pygame.mixer.music.set_volume(1)
 print(bob)
