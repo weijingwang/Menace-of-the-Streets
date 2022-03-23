@@ -37,6 +37,7 @@ class Obstacle(pygame.sprite.Sprite):
         self.scale = 0
         self.image = pygame.image.load("./assets/car_f.png").convert_alpha()
         self.original_image = self.image
+        self.image = pygame.transform.scale(self.original_image, (0, 0))
         self.rect = self.image.get_rect()
         self.rect.midbottom = 1280/2,720/3
 
@@ -178,13 +179,13 @@ class Game():
 
         if self.move_right==True:
             if self.x>=self.next_x:
-                self.x-=self.screen_width*0.05#0.0125
+                self.x-=self.screen_width*0.04#0.0125
             else:
                 self.x=self.next_x
                 self.move_right=False
         if self.move_left==True:
             if self.x<=self.next_x:
-                self.x+=self.screen_width*0.05
+                self.x+=self.screen_width*0.04
             else:
                 self.x=self.next_x
                 self.move_left=False
