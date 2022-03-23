@@ -31,9 +31,9 @@ class Background(pygame.sprite.Sprite):
         
 
 class Obstacle(pygame.sprite.Sprite):
-    def __init__(self,current_lane,lane_data,type) -> None:
+    def __init__(self,current_lane,lane_data,type,my_lane) -> None:
         super().__init__()
-
+        self.my_lane = my_lane
         self.image_link = None
         self.type = type
 
@@ -41,17 +41,15 @@ class Obstacle(pygame.sprite.Sprite):
 
         if self.type == "car_f":
             self.image_link = "./assets/car_f.png"
-            self.my_lane = random.randrange(3,5)
+
             self.height_multiplier = 0.5
 
         elif self.type == "car_b":
             self.image_link = "./assets/car_b.png"
-            self.my_lane = random.randrange(1,3)
             self.height_multiplier = 0.5
 
         elif self.type == "house":
             self.image_link = "./assets/house_off.png"
-            self.my_lane = random.choice((0,5))
             self.height_multiplier = 3
 
         self.image = pygame.image.load("./assets/car_b.png").convert_alpha()
@@ -76,10 +74,13 @@ class Obstacle(pygame.sprite.Sprite):
 
         # self.width = width
         # self.height = height
+        self.is_kill = False
         
+
     def update(self,lane_data):
         # print(self.my_lane)
         if self.scale>800:
+            self.is_kill=True
             self.kill()
 
 
@@ -145,6 +146,15 @@ class Game():
             [3,4,(132,132,132)],
             [4,5,(165,165,165)],
             [5,6,(198,248,198)]
+        ]
+
+        self.lane_occupant = [
+            False,
+            False,
+            False,
+            False,
+            False,
+            False
         ]
 
 
@@ -239,10 +249,10 @@ class Game():
         self.house_group.draw(self.screen)
         self.car_f_group.draw(self.screen)
         self.car_b_group.draw(self.screen)
-        self.house_group.update(self.lane_data)
-        self.car_f_group.update(self.lane_data)
-        self.car_b_group.update(self.lane_data)
-
+        a=self.house_group.update(self.lane_data)
+        b=self.car_f_group.update(self.lane_data)
+        c=self.car_b_group.update(self.lane_data)
+        print(a,b,c)
 
         self.screen.blit(pygame.transform.scale(self.fog,(self.screen_width,self.screen_height)),(0,0))
         # self.screen.blit(pygame.transform.scale(self.evil_twin,(int(self.screen_width/2),self.screen_height)),(0,0))
@@ -258,10 +268,12 @@ class Game():
 
     def spawn_obstacles(self):
         current_obstacles = len(self.house_group)+len(self.car_f_group)+len(self.car_b_group)
-        if current_obstacles<10:
-            choose_type = random.choice(["car_b","car_f","house"])
-            for x in range(0,10-current_obstacles):
-                test = Obstacle(self.current_lane,self.lane_data,choose_type)
+        if current_obstacles<5:
+
+            for x in range(0,5-current_obstacles):
+                choose_type = random.choice(["car_b","car_f","house"])
+                my_lane = random.randrange(0,6)
+                test = Obstacle(self.current_lane,self.lane_data,choose_type,my_lane)
                 if choose_type == "house":
                     self.house_group.add(test)
                 elif choose_type == "car_f":
