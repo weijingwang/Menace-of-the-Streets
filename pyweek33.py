@@ -3,12 +3,33 @@ import pygame
 import pygame.gfxdraw
 import os
 import random
+
+class Background():
+	def __init__(self,scroll_speed):
+		self.x=1280/2
+		self.y=720/3
+		self.scroll_speed = scroll_speed
+		self.image =pygame.image.load("./assets/cityback.png").convert_alpha()
+		self.rect = self.image.get_rect()
+		self.scroll_speed_bank = scroll_speed
+
+		
+	def draw(self,screen):
+
+		self.x-=self.scroll_speed
+
+		if self.x<=-1280:
+			self.x=1280
+
+		screen.blit(pygame.transform.scale(self.image,(1280,240)),(self.x,self.y))
+
+
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self,current_lane,lane_data,my_lane,z) -> None:
         super().__init__()
 
         self.scale = 0
-        self.image = pygame.image.load("./assets/car_b.png").convert_alpha()
+        self.image = pygame.image.load("./assets/house_off.png").convert_alpha()
         self.original_image = self.image
         self.rect = self.image.get_rect()
         self.rect.midbottom = 1280/2,720/3
@@ -20,7 +41,7 @@ class Obstacle(pygame.sprite.Sprite):
         self.pos = [1280/2,720/3]
 
 
-        self.speed =0.5
+        self.speed =0.2
         self.z = z
 
 
@@ -32,7 +53,7 @@ class Obstacle(pygame.sprite.Sprite):
         # if keys[pygame.K_SPACE]:
         #     self.pos[1]+=100
         # print(self.rect.x)
-        if self.scale>1000:
+        if self.scale>800:
             self.kill()
 
 
@@ -61,7 +82,7 @@ class Obstacle(pygame.sprite.Sprite):
         # print(obst_width)
         self.scale =int(obst_width)
 
-        self.image = pygame.transform.scale(self.original_image, (self.scale, int(self.scale/2)))
+        self.image = pygame.transform.scale(self.original_image, (self.scale, int(self.scale*3)))
         self.rect = self.image.get_rect(midbottom = self.pos)
         # print(self.rect)
 
@@ -70,8 +91,12 @@ class Game():
     def __init__(self,current_lane,screen):
         #IMAGES
         self.stars_bg = pygame.image.load("./assets/stars.png").convert_alpha()
-        self.POV_car = pygame.image.load("./assets/POV_car.png").convert_alpha()
+        self.cityback = pygame.image.load("./assets/cityback.png").convert_alpha()
+        self.POV_car_L = pygame.image.load("./assets/POV_car_L.png").convert_alpha()
+        self.POV_car_M = pygame.image.load("./assets/POV_car_M.png").convert_alpha()
+        self.POV_car_R = pygame.image.load("./assets/POV_car_R.png").convert_alpha()
         self.fog = pygame.image.load("./assets/fog.png").convert_alpha()
+        self.image = self.POV_car_M
         #BASIC
         self.screen = screen
         self.screen_height = 720
@@ -114,6 +139,7 @@ class Game():
         #OBSTACLES
         self.obstacle_group = pygame.sprite.Group()
 
+        self.my_background = Background(10)
 
     def update_lane(self):
         for event in pygame.event.get():
@@ -121,13 +147,19 @@ class Game():
                 quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
+                    self.image=self.POV_car_R
                     self.current_lane+=1
                     self.next_x = self.current_lane*-self.road_width
                     self.move_right = True
                 elif event.key == pygame.K_LEFT:
+                    self.image=self.POV_car_L
                     self.current_lane-=1
                     self.next_x = self.current_lane*-self.road_width
                     self.move_left = True
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
+                    self.image = self.POV_car_M
+
         if self.move_right==True:
             if self.x>=self.next_x:
                 self.x-=self.screen_width*0.0125
@@ -160,6 +192,8 @@ class Game():
         self.screen.blit(pygame.transform.scale(self.stars_bg,(screen_width,screen_height)),(0,0))
 
         pygame.draw.rect(self.screen,(14,47,38),(0,240,1280,480))
+        # self.screen.blit(pygame.transform.scale(self.cityback,(screen_width,screen_height)),(0,0))
+        self.my_background.draw(self.screen)
         # random_x = randrange(-3,3)
         # random_y = randrange(-3,3)
 
@@ -173,7 +207,7 @@ class Game():
 
         self.screen.blit(pygame.transform.scale(self.fog,(self.screen_width,self.screen_height)),(0,0))
         pygame.draw.rect(self.screen,"black",(0,620,1280,100))
-        self.screen.blit(pygame.transform.scale(self.POV_car,(screen_width,screen_height)),(0,0))
+        self.screen.blit(pygame.transform.scale(self.image,(screen_width,screen_height)),(0,0))
 
     def move_player(self):
         keys = pygame.key.get_pressed()
@@ -181,11 +215,18 @@ class Game():
             self.z+=1
 
     def spawn_obstacles(self):
-        enemy_count=random.randrange(0,4)
+        enemy_count=random.randrange(0,3)
+        house_count = random.randrange(0,3)
         
+        # if self.z>=40:
+        #     for x in range(0,enemy_count):
+        #         x = Obstacle(self.current_lane,self.lane_data,random.randrange(1,5),self.z)
+        #         self.obstacle_group.add(x)     
+        #     self.z=0
+        self.z+=0.01
         if self.z>=40:
-            for x in range(0,enemy_count):
-                x = Obstacle(self.current_lane,self.lane_data,random.randrange(1,5),self.z)
+            for x in range(0,house_count):
+                x = Obstacle(self.current_lane,self.lane_data,random.choice([0,5]),self.z)
                 self.obstacle_group.add(x)
             self.z=0
         print(self.z)
@@ -204,7 +245,7 @@ screen = pygame.display.set_mode((screen_width,screen_height))
 clock= pygame.time.Clock()
 done = False
 bob=pygame.mixer.music.load("./assets/i drivin and they hatin.mp3")
-# bob=pygame.mixer.music.load("./assets/menace of the streets.mp3")
+bob=pygame.mixer.music.load("./assets/menace of the streets.mp3")
 pygame.mixer.music.play(-1,0.0)
 pygame.mixer.music.set_volume(1)
 print(bob)
