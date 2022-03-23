@@ -1,3 +1,4 @@
+from multiprocessing.spawn import spawn_main
 import pygame
 import pygame.gfxdraw
 import os
@@ -39,18 +40,22 @@ class Obstacle(pygame.sprite.Sprite):
 
         self.height_multiplier = 0
 
-        if self.type == "car_f":
+        if self.type == 1 or self.type == 2:
             self.image_link = "./assets/car_f.png"
 
             self.height_multiplier = 0.5
 
-        elif self.type == "car_b":
+        elif self.type == self.type == 3 or self.type ==4:
             self.image_link = "./assets/car_b.png"
             self.height_multiplier = 0.5
 
-        elif self.type == "house":
+        elif self.type == 0 or self.type == 5:
             self.image_link = "./assets/house_off.png"
             self.height_multiplier = 3
+
+        elif self.type == 6:
+            self.image = "./assets/empty.png"
+
 
         self.image = pygame.image.load("./assets/car_b.png").convert_alpha()
 
@@ -246,15 +251,17 @@ class Game():
         for lane in self.lane_array:
             pygame.gfxdraw.filled_polygon(self.screen,[(self.x0,self.y0),[self.x+self.road_width*lane[0],self.screen_height],[self.x+self.road_width*lane[1],self.screen_height]],lane[2])
 
-        self.house_group.draw(self.screen)
+
         self.car_f_group.draw(self.screen)
         self.car_b_group.draw(self.screen)
+        self.screen.blit(pygame.transform.scale(self.fog,(self.screen_width,self.screen_height)),(0,0))
+        self.house_group.draw(self.screen)
+
         a=self.house_group.update(self.lane_data)
         b=self.car_f_group.update(self.lane_data)
         c=self.car_b_group.update(self.lane_data)
-        print(a,b,c)
+        # print(a,b,c)
 
-        self.screen.blit(pygame.transform.scale(self.fog,(self.screen_width,self.screen_height)),(0,0))
         # self.screen.blit(pygame.transform.scale(self.evil_twin,(int(self.screen_width/2),self.screen_height)),(0,0))
         # self.screen.blit(pygame.transform.scale(self.mayor_twin,(int(self.screen_width/2),self.screen_height)),(int(self.screen_width/2),0))
 
@@ -268,18 +275,21 @@ class Game():
 
     def spawn_obstacles(self):
         current_obstacles = len(self.house_group)+len(self.car_f_group)+len(self.car_b_group)
-        if current_obstacles<5:
+        print(self.lane_occupant)
+        if current_obstacles == 0:
+            for count, occupant in enumerate(self.lane_occupant):
+                if occupant==False: #and random.choice((True,False))==True:
+                        # choose_type = random.choice(["car_b","car_f","house"])
+                    test = Obstacle(self.current_lane,self.lane_data,count,count)
+                    if count == 0 or count ==5:
+                        self.house_group.add(test)
 
-            for x in range(0,5-current_obstacles):
-                choose_type = random.choice(["car_b","car_f","house"])
-                my_lane = random.randrange(0,6)
-                test = Obstacle(self.current_lane,self.lane_data,choose_type,my_lane)
-                if choose_type == "house":
-                    self.house_group.add(test)
-                elif choose_type == "car_f":
-                    self.car_f_group.add(test) 
-                elif choose_type == "car_b":
-                    self.car_b_group.add(test)      
+                    elif count == 1 or count ==2:
+                        self.car_f_group.add(test) 
+                    elif count ==3 or count == 4:
+                        self.car_b_group.add(test) 
+                    self.lane_occupant[count] = True
+        
         self.z=0
 
         # print(self.z)
@@ -298,10 +308,10 @@ screen_height = 720
 screen = pygame.display.set_mode((screen_width,screen_height))
 clock= pygame.time.Clock()
 done = False
-bob=pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
-bob=pygame.mixer.music.load("./assets/music/before the disaster.mp3")
-pygame.mixer.music.play(-1,0.0)
-pygame.mixer.music.set_volume(1)
+# bob=pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
+# bob=pygame.mixer.music.load("./assets/music/before the disaster.mp3")
+# pygame.mixer.music.play(-1,0.0)
+# pygame.mixer.music.set_volume(1)
 # print(bob)
 my_game = Game(4,screen)
 while not done:
