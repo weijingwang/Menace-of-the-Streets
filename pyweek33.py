@@ -115,6 +115,7 @@ class Game():
         self.POV_car_M = pygame.image.load("./assets/POV_car_M.png").convert_alpha()
         self.POV_car_R = pygame.image.load("./assets/POV_car_R.png").convert_alpha()
         self.fog = pygame.image.load("./assets/fog.png").convert_alpha()
+        self.evil_twin = pygame.image.load("./assets/evil_twin.png").convert_alpha()
         self.image = self.POV_car_M
         #BASIC
         self.screen = screen
@@ -236,6 +237,8 @@ class Game():
 
 
         self.screen.blit(pygame.transform.scale(self.fog,(self.screen_width,self.screen_height)),(0,0))
+        self.screen.blit(pygame.transform.scale(self.evil_twin,(self.screen_width,self.screen_height)),(0,0))
+
         pygame.draw.rect(self.screen,"black",(0,620,1280,100))
         self.screen.blit(pygame.transform.scale(self.image,(screen_width,screen_height)),(0,0))
 
