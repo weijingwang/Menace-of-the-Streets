@@ -267,8 +267,8 @@ screen_height = 720
 screen = pygame.display.set_mode((screen_width,screen_height))
 clock= pygame.time.Clock()
 done = False
-bob=pygame.mixer.music.load("./assets/i drivin and they hatin.mp3")
-# bob=pygame.mixer.music.load("./assets/menace of the streets.mp3")
+bob=pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
+bob=pygame.mixer.music.load("./assets/music/before the disaster.mp3")
 pygame.mixer.music.play(-1,0.0)
 pygame.mixer.music.set_volume(1)
 print(bob)
