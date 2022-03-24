@@ -3,6 +3,8 @@ import pygame.gfxdraw
 import os
 import random
 
+
+
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self,type,my_lane) -> None:
         super().__init__()
@@ -204,6 +206,10 @@ class Game():
         self.obst_house_on = [0,0,0,0,0,0]
         self.obst_can_turn_house_on = [1,1,1,1,1,1]
 
+        #TEXT
+        self.scoreFont = pygame.font.Font(None, 80)
+        self.scoreText = self.scoreFont.render("score is: "+str(self.my_score), True,("white"))
+
 
 
     def update_lane(self):
@@ -284,7 +290,7 @@ class Game():
         for x in range(0,6):
             keys = pygame.key.get_pressed()
 
-            if self.obst_scale[x]>800:#kill sprite. RESET
+            if self.obst_scale[x]>900:#kill sprite. RESET
                 self.obst_pos[x] = [1280/2,720/3]
                 self.obst_scale[x] = 0
                 self.obst_speed[x]=0.0001
@@ -297,9 +303,11 @@ class Game():
             if self.the_one_who_will_be_removed == x:#prevent 4 cars in a row on road by removing one random one
                 self.obst_is_alive[x]=0
 
-            # if self.obst_scale[x]>800 and x == self.current_lane:
-            #     remove_this = True
-                # quit()
+            if self.obst_is_alive[x]:
+                if self.obst_scale[x]>800 and x == self.current_lane:
+                    quit()
+                    # print("DIE")
+
             if keys[pygame.K_SPACE]:
                 self.obst_speed[x] += self.obst_new_accel[x]*5
                 self.obst_new_accel[x]+=0.001
@@ -330,7 +338,7 @@ class Game():
             # self.rect = self.image.get_rect(midbottom = pos)
 
             if x == 0 or x ==5:
-                if self.obst_scale[x]<800 and self.obst_scale[x] >100:# and can_turn_house_on == True:
+                if self.obst_scale[x]<900 and self.obst_scale[x] >100:# and can_turn_house_on == True:
                     # print("do it now")
                     if (x == 0 and self.current_lane ==1) or (x == 5 and self.current_lane ==4):
                         if keys[pygame.K_SPACE]:
@@ -346,7 +354,7 @@ class Game():
             # print(self.scored,"in loops"+str(self.score))
         # print(self.obst_pos,self.obst_scale,self.my_score)
             # return(self.obst_pos,self.obst_scale,self.my_score)
-            print(self.my_score)
+            # print(self.my_score)
     def spawn_obstacles(self):
         # print(self.obst_scale)
         current_obstacles = len(self.lane0)+len(self.lane1)+len(self.lane2)+len(self.lane3)+len(self.lane4)+len(self.lane5)
@@ -367,7 +375,10 @@ class Game():
         for x in range(0,6):
             pass
                 
-
+    def draw_score(self):
+        self.scoreText = self.scoreFont.render("score is: "+str(self.my_score), True,("white"))
+        self.screen.blit(self.scoreText,(900,50))
+        
 
 
 pygame.mixer.pre_init()
@@ -378,10 +389,10 @@ screen = pygame.display.set_mode((screen_width,screen_height))
 pygame.display.set_caption("pyweek33--Menace of the Streets")
 clock= pygame.time.Clock()
 done = False
-# pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
-# # pygame.mixer.music.load("./assets/music/before the disaster.mp3")
-# pygame.mixer.music.play(-1,0.0)
-# pygame.mixer.music.set_volume(1)
+pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
+pygame.mixer.music.load("./assets/music/before the disaster.mp3")
+pygame.mixer.music.play(-1,0.0)
+pygame.mixer.music.set_volume(1)
 
 my_game = Game(4,screen)
 while not done:
@@ -389,6 +400,7 @@ while not done:
     my_game.update_lane()
     my_game.spawn_obstacles()
     my_game.run()
+    my_game.draw_score()
 
 
     clock.tick(60)
