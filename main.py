@@ -4,7 +4,7 @@ import os
 import random
 
 class Obstacle(pygame.sprite.Sprite):
-    def __init__(self,pos,scale,type,my_lane) -> None:
+    def __init__(self,type,my_lane) -> None:
         super().__init__()
         self.my_lane = my_lane
         self.image_link = None
@@ -39,8 +39,8 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.midbottom = 1280/2,720/3
 
-        self.pos = pos#[1280/2,720/3]
-        self.scale = scale
+        # self.pos = [1280/2,720/3]
+        # self.scale = scale
 
         # self.speed =0.0001
         # self.accel = 0.005
@@ -53,14 +53,14 @@ class Obstacle(pygame.sprite.Sprite):
         self.scored = False
         self.score = 0
     
-    def update(self,current_lane,remove_this):
+    def update(self,pos,scale,current_lane,remove_this):
         # print(self.my_lane)
         # print(self.scale)
         keys = pygame.key.get_pressed()
         # if remove_this == self.my_lane:
         #     print("killed",self.my_lane)
         #     self.kill()
-        if self.scale>800:
+        if scale>800:
             self.is_kill=True
             self.kill()
         # if self.scale>800 and self.my_lane == current_lane:
@@ -96,8 +96,8 @@ class Obstacle(pygame.sprite.Sprite):
         # obst_width = abs(new_xL-new_xR)
         # self.scale =int(obst_width)
 
-        self.image = pygame.transform.scale(self.original_image, (int(self.scale), int(self.scale*self.height_multiplier)))
-        self.rect = self.image.get_rect(midbottom = self.pos)
+        self.image = pygame.transform.scale(self.original_image, (int(scale), int(scale*self.height_multiplier)))
+        self.rect = self.image.get_rect(midbottom = pos)
         # print(self.scale,self.rect)
         # if self.type == 0 or self.type ==5:
         #     if scale<800 and scale >100 and self.can_turn_house_on == True:
@@ -263,12 +263,12 @@ class Game():
         self.lane0.draw(self.screen)
         self.lane5.draw(self.screen)
 
-        self.lane0.update(self.current_lane,self.the_one_who_will_be_removed)
-        self.lane1.update(self.current_lane,self.the_one_who_will_be_removed)
-        self.lane2.update(self.current_lane,self.the_one_who_will_be_removed)
-        self.lane3.update(self.current_lane,self.the_one_who_will_be_removed)
-        self.lane4.update(self.current_lane,self.the_one_who_will_be_removed)
-        self.lane5.update(self.current_lane,self.the_one_who_will_be_removed)
+        self.lane0.update(self.obst_pos[0],self.obst_scale[0],self.current_lane,self.the_one_who_will_be_removed)
+        self.lane1.update(self.obst_pos[1],self.obst_scale[1],self.current_lane,self.the_one_who_will_be_removed)
+        self.lane2.update(self.obst_pos[2],self.obst_scale[2],self.current_lane,self.the_one_who_will_be_removed)
+        self.lane3.update(self.obst_pos[3],self.obst_scale[3],self.current_lane,self.the_one_who_will_be_removed)
+        self.lane4.update(self.obst_pos[4],self.obst_scale[4],self.current_lane,self.the_one_who_will_be_removed)
+        self.lane5.update(self.obst_pos[5],self.obst_scale[5],self.current_lane,self.the_one_who_will_be_removed)
 
         # self.screen.blit(pygame.transform.scale(self.evil_twin,(int(self.screen_width/2),self.screen_height)),(0,0))
         # self.screen.blit(pygame.transform.scale(self.mayor_twin,(int(self.screen_width/2),self.screen_height)),(int(self.screen_width/2),0))
@@ -289,7 +289,7 @@ class Game():
                 self.obst_accel[x]=0.005
                 self.obst_new_accel[x]=0.01
                 print("reset")
-            if self.obst_scale[x]>800 and my_lane == self.current_lane:
+            if self.obst_scale[x]>800 and x == self.current_lane:
                 remove_this = True
                 # quit()
             if keys[pygame.K_SPACE]:
@@ -337,7 +337,7 @@ class Game():
             # return(self.obst_pos,self.obst_scale,self.my_score)
 
     def spawn_obstacles(self):
-
+        # print(self.obst_scale)
         current_obstacles = len(self.lane0)+len(self.lane1)+len(self.lane2)+len(self.lane3)+len(self.lane4)+len(self.lane5)
         self.calculate_obstacle_pos(None)
 
@@ -346,7 +346,8 @@ class Game():
             for x in range(0,6):
 
                 if len(self.lane_occupant[x]) ==0 and random.choice((True,False))==True:
-                    test = Obstacle(self.obst_pos[x],self.obst_scale[x]+100,x,x)
+                    # print(self.obst_pos[x])
+                    test = Obstacle(x,x)
                     self.lane_occupant[x].add(test)
                     
             if len(self.lane_occupant[1]) == 1 and len(self.lane_occupant[2]) == 1 and len(self.lane_occupant[3]) == 1 and len(self.lane_occupant[4]) == 1:
