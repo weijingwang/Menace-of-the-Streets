@@ -80,9 +80,12 @@ class Obstacle(pygame.sprite.Sprite):
         self.is_kill = False
         
 
-    def update(self,lane_data,current_lane):
+    def update(self,lane_data,current_lane,remove_this):
         # print(self.my_lane)
         keys = pygame.key.get_pressed()
+        if remove_this == self.my_lane:
+            print("killed",self.my_lane)
+            self.kill()
         if self.scale>800:
             self.is_kill=True
             self.kill()
@@ -93,7 +96,7 @@ class Obstacle(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE]:
             self.speed += self.new_accel*5
             self.new_accel+=0.001
-        print(self.new_accel)
+        # print(self.new_accel)
             # print("YESSSSSS++++++++++")
         if self.type == 0 or self.type ==5:
             if self.scale<800 and self.scale >100:
@@ -184,10 +187,6 @@ class Game():
 
 
         #OBSTACLES
-        # self.house_group = pygame.sprite.Group()
-        # self.car_f_group = pygame.sprite.Group()
-        # self.car_b_group = pygame.sprite.Group()
-
         self.lane0 = pygame.sprite.Group()
         self.lane1 = pygame.sprite.Group()
         self.lane2 = pygame.sprite.Group()
@@ -195,16 +194,8 @@ class Game():
         self.lane4 = pygame.sprite.Group()
         self.lane5 = pygame.sprite.Group()
         self.lane_occupant = [self.lane0,self.lane1,self.lane2,self.lane3,self.lane4,self.lane5]
-        # self.my_backgroundL = Background(5,"left",1280/2)
-        # self.my_backgroundR = Background(5,"right",1280/2)
-        # self.my_backgroundL2 = Background(5,"right",0)
-        # self.my_backgroundR2 = Background(5,"left",1280)
 
-        # self.background_group = pygame.sprite.Group()
-        # self.background_group.add(self.my_backgroundL)
-        # self.background_group.add(self.my_backgroundR)
-        # self.background_group.add(self.my_backgroundL2)
-        # self.background_group.add(self.my_backgroundR2)
+        self.the_one_who_will_be_removed = 0
 
 
     def update_lane(self):
@@ -276,46 +267,37 @@ class Game():
         self.lane0.draw(self.screen)
         self.lane5.draw(self.screen)
 
-        self.lane0.update(self.lane_data,self.current_lane)
-        self.lane1.update(self.lane_data,self.current_lane)
-        self.lane2.update(self.lane_data,self.current_lane)
-        self.lane3.update(self.lane_data,self.current_lane)
-        self.lane4.update(self.lane_data,self.current_lane)
-        self.lane5.update(self.lane_data,self.current_lane)
+        self.lane0.update(self.lane_data,self.current_lane,self.the_one_who_will_be_removed)
+        self.lane1.update(self.lane_data,self.current_lane,self.the_one_who_will_be_removed)
+        self.lane2.update(self.lane_data,self.current_lane,self.the_one_who_will_be_removed)
+        self.lane3.update(self.lane_data,self.current_lane,self.the_one_who_will_be_removed)
+        self.lane4.update(self.lane_data,self.current_lane,self.the_one_who_will_be_removed)
+        self.lane5.update(self.lane_data,self.current_lane,self.the_one_who_will_be_removed)
 
-        # print(self.current_lane)
         # self.screen.blit(pygame.transform.scale(self.evil_twin,(int(self.screen_width/2),self.screen_height)),(0,0))
         # self.screen.blit(pygame.transform.scale(self.mayor_twin,(int(self.screen_width/2),self.screen_height)),(int(self.screen_width/2),0))
 
         pygame.draw.rect(self.screen,"black",(0,620,1280,100))
         self.screen.blit(pygame.transform.scale(self.image,(screen_width,screen_height)),(0,0))
 
-    # def move_player(self):
-    #     keys = pygame.key.get_pressed()
-    #     if keys[pygame.K_SPACE]:
-    #         self.z+=1
+
 
     def spawn_obstacles(self):
         current_obstacles = len(self.lane0)+len(self.lane1)+len(self.lane2)+len(self.lane3)+len(self.lane4)+len(self.lane5)
         # print(self.lane_occupant)
         if current_obstacles == 0:
+            self.the_one_who_will_be_removed = None
             for count, x in enumerate(range(0,6)):
                 # print(count)
                 if len(self.lane_occupant[x]) ==0 and random.choice((True,False))==True:
                     test = Obstacle(x,x)
                     self.lane_occupant[x].add(test)
             if len(self.lane_occupant[1]) == 1 and len(self.lane_occupant[2]) == 1 and len(self.lane_occupant[3]) == 1 and len(self.lane_occupant[4]) == 1:
-                the_one_who_will_be_removed = random.choice((1,2,3,4))
-                print("remove one")
+                self.the_one_who_will_be_removed = random.choice((1,2,3,4))
+                # print("remove one",self.the_one_who_will_be_removed) 
         
-        # self.z+=0
 
-        # print(self.z)
-        # print(current_obstacles)
                 
-
-
-
 
 
 
@@ -328,13 +310,12 @@ pygame.display.set_caption("pyweek33 - Menace of the Streets")
 clock= pygame.time.Clock()
 done = False
 bob=pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
-# bob=pygame.mixer.music.load("./assets/music/before the disaster.mp3")
+bob=pygame.mixer.music.load("./assets/music/before the disaster.mp3")
 pygame.mixer.music.play(-1,0.0)
 pygame.mixer.music.set_volume(1)
 
 my_game = Game(4,screen)
 while not done:
-    # my_game.move_player()
     my_game.update_lane()
     my_game.spawn_obstacles()
     my_game.run()
