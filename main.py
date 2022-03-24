@@ -127,6 +127,21 @@ class Game():
         self.mayor_twin = pygame.image.load("./assets/mayor_twin.png").convert_alpha()
 
         self.image = self.POV_car_M
+        #MUSIC
+        pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
+        # pygame.mixer.music.load("./assets/music/before the disaster.mp3")
+        pygame.mixer.music.play(-1,0.0)
+        pygame.mixer.music.set_volume(1)
+        #SOUND
+        self.channel1 = pygame.mixer.Channel(1)
+        self.channel2 = pygame.mixer.Channel(2)
+        self.channel1.set_volume(0.75)
+        self.channel2.set_volume(0.25)
+        self.sound_car_rev = pygame.mixer.Sound("./assets/sound/car_rev.ogg")
+        self.sound_car_rev_loops = 0
+        self.sound_elaphant = pygame.mixer.Sound("./assets/sound/dog.ogg")
+
+
         #BASIC
         self.screen = screen
         self.screen_height = 720
@@ -206,6 +221,10 @@ class Game():
         self.obst_house_on = [0,0,0,0,0,0]
         self.obst_can_turn_house_on = [1,1,1,1,1,1]
 
+        self.obst_speed_og=0.0001
+        self.obst_accel_og=0.005
+        self.obst_new_accel_og=0.03
+
         #TEXT
         self.scoreFont = pygame.font.Font(None, 80)
         self.scoreText = self.scoreFont.render("score is: "+str(self.my_score), True,("white"))
@@ -227,9 +246,15 @@ class Game():
                     self.current_lane-=1
                     self.next_x = self.current_lane*-self.road_width
                     self.move_left = True
+                elif event.key == pygame.K_SPACE:
+                    self.sound_car_rev_loops = -1
+                    self.channel1.play(self.sound_car_rev,self.sound_car_rev_loops)
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
                     self.image = self.POV_car_M
+                elif event.key == pygame.K_SPACE:
+                    self.channel1.fadeout(1000)
+                    self.sound_car_rev_loops = 0
 
         if self.move_right==True:
             if self.x>=self.next_x:
@@ -293,9 +318,9 @@ class Game():
             if self.obst_scale[x]>900:#kill sprite. RESET
                 self.obst_pos[x] = [1280/2,720/3]
                 self.obst_scale[x] = 0
-                self.obst_speed[x]=0.0001
-                self.obst_accel[x]=0.005
-                self.obst_new_accel[x]=0.01
+                self.obst_speed[x]=self.obst_speed_og
+                self.obst_accel[x]=self.obst_accel_og
+                self.obst_new_accel[x]=self.obst_new_accel_og
                 self.obst_is_alive[x]=0
                 self.obst_can_turn_house_on[x]=1
                 self.obst_house_on[x]=0
@@ -305,8 +330,9 @@ class Game():
 
             if self.obst_is_alive[x]:
                 if self.obst_scale[x]>800 and x == self.current_lane:
-                    quit()
+                    # quit()
                     # print("DIE")
+                    pass
 
             if keys[pygame.K_SPACE]:
                 self.obst_speed[x] += self.obst_new_accel[x]*5
@@ -336,17 +362,19 @@ class Game():
             # print(self.obst_is_alive)
             # self.image = pygame.transform.scale(original_image, (scale, int(scale*height_multiplier)))
             # self.rect = self.image.get_rect(midbottom = pos)
-
-            if x == 0 or x ==5:
-                if self.obst_scale[x]<900 and self.obst_scale[x] >100:# and can_turn_house_on == True:
-                    # print("do it now")
-                    if (x == 0 and self.current_lane ==1) or (x == 5 and self.current_lane ==4):
-                        if keys[pygame.K_SPACE]:
-                            # print("yes")
-                            if self.obst_can_turn_house_on[x]==1:
-                                self.obst_house_on[x]=1
-                                self.obst_can_turn_house_on[x]=0
-                                self.my_score+=1
+            if self.obst_is_alive[x]:
+                if x == 0 or x ==5:
+                    if self.obst_scale[x]<900 and self.obst_scale[x] >100:# and can_turn_house_on == True:
+                        # print("do it now")
+                        if (x == 0 and self.current_lane ==1) or (x == 5 and self.current_lane ==4):
+                            if keys[pygame.K_SPACE]:
+                                # print("yes")
+                                if self.obst_can_turn_house_on[x]==1:
+                                    self.obst_house_on[x]=1
+                                    self.obst_can_turn_house_on[x]=0
+                                    self.channel2.play(self.sound_elaphant)
+                                    # self.channel2.fadeout(0)
+                                    self.my_score+=1
                                 
 
                             # self.can_turn_house_on = False
@@ -389,10 +417,7 @@ screen = pygame.display.set_mode((screen_width,screen_height))
 pygame.display.set_caption("pyweek33--Menace of the Streets")
 clock= pygame.time.Clock()
 done = False
-pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
-pygame.mixer.music.load("./assets/music/before the disaster.mp3")
-pygame.mixer.music.play(-1,0.0)
-pygame.mixer.music.set_volume(1)
+
 
 my_game = Game(4,screen)
 while not done:
