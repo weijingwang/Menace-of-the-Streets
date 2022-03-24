@@ -28,8 +28,6 @@ class Background(pygame.sprite.Sprite):
                 self.pos[0]=self.x
             self.rect = self.image.get_rect(midbottom = self.pos)
 
-        
-
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self,type,my_lane) -> None:
         super().__init__()
@@ -71,13 +69,10 @@ class Obstacle(pygame.sprite.Sprite):
 
         self.speed =0.0001
         self.accel = 0.005
-        self.new_accel = 0.005
-        # self.z = z
+        self.new_accel = 0.01
 
-
-        # self.width = width
-        # self.height = height
         self.is_kill = False
+        self.is_house_on = False
         
 
     def update(self,lane_data,current_lane,remove_this):
@@ -98,14 +93,7 @@ class Obstacle(pygame.sprite.Sprite):
             self.new_accel+=0.001
         # print(self.new_accel)
             # print("YESSSSSS++++++++++")
-        if self.type == 0 or self.type ==5:
-            if self.scale<800 and self.scale >100:
-                # print("do it now")
-                if (self.my_lane == 0 and current_lane ==1) or (self.my_lane == 5 and current_lane ==4):
-                    if keys[pygame.K_SPACE]:
-                        # self.kill()
-                        self.original_image = self.house_on
-                        # print("YESSSSSS++++++++++")
+
         # print(current_lane)
         delta_y_f = 240-720
         delta_x_f = (1280/2)-(((lane_data[self.my_lane][1]-lane_data[self.my_lane][0])/2)+lane_data[self.my_lane][0])
@@ -132,11 +120,22 @@ class Obstacle(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.original_image, (self.scale, int(self.scale*self.height_multiplier)))
         self.rect = self.image.get_rect(midbottom = self.pos)
 
+        if self.type == 0 or self.type ==5:
+            if self.scale<800 and self.scale >100 and self.image:
+                # print("do it now")
+                if (self.my_lane == 0 and current_lane ==1) or (self.my_lane == 5 and current_lane ==4):
+                    if keys[pygame.K_SPACE]:
+                        # self.kill()
+                        self.original_image = self.house_on
+                        self.is_house_on = True
+                        # print("YESSSSSS++++++++++")
+        if self.is_house_on ==True:
+            return True
+
 class Game():
     def __init__(self,current_lane,screen):
         #IMAGES
         self.stars_bg = pygame.image.load("./assets/stars.png").convert_alpha()
-        self.cityback = pygame.image.load("./assets/cityback.png").convert_alpha()
         self.POV_car_L = pygame.image.load("./assets/POV_car_L.png").convert_alpha()
         self.POV_car_M = pygame.image.load("./assets/POV_car_M.png").convert_alpha()
         self.POV_car_R = pygame.image.load("./assets/POV_car_R.png").convert_alpha()
@@ -172,9 +171,6 @@ class Game():
         ]
 
 
-
-
-        # pygame.gfxdraw.filled_polygon(self.screen,[(self.x0,self.y0),[self.x+self.road_width*lane[0],self.screen_height],[self.x+self.road_width*lane[1],self.screen_height]],lane[2])
         self.lane_data = [
             [self.x+self.road_width*self.lane_array[0][0],self.x+self.road_width*self.lane_array[0][1]],
             [self.x+self.road_width*self.lane_array[1][0],self.x+self.road_width*self.lane_array[1][1]],
@@ -231,7 +227,7 @@ class Game():
                 self.move_left=False
         if self.current_lane==-1 or self.current_lane ==6:
             print("YOU DIE")
-        # print(self.lane_data)
+
         self.lane_data = [
             [self.x+self.road_width*self.lane_array[0][0],self.x+self.road_width*self.lane_array[0][1]],
             [self.x+self.road_width*self.lane_array[1][0],self.x+self.road_width*self.lane_array[1][1]],
@@ -240,20 +236,12 @@ class Game():
             [self.x+self.road_width*self.lane_array[4][0],self.x+self.road_width*self.lane_array[4][1]],
             [self.x+self.road_width*self.lane_array[5][0],self.x+self.road_width*self.lane_array[5][1]]
         ]
-        # print(self.lane_data)
 
-
-        # print(self.lane_data)
     def run(self):
         self.screen.fill((20,24,82))
         self.screen.blit(pygame.transform.scale(self.stars_bg,(screen_width,screen_height)),(0,0))
 
         pygame.draw.rect(self.screen,(14,47,38),(0,240,1280,480))
-        # self.screen.blit(pygame.transform.scale(self.cityback,(screen_width,screen_height)),(0,0))
-        # self.background_group.draw(self.screen)
-        # self.background_group.update()
-        # random_x = randrange(-3,3)
-        # random_y = randrange(-3,3)
 
         for lane in self.lane_array:
             pygame.gfxdraw.filled_polygon(self.screen,[(self.x0,self.y0),[self.x+self.road_width*lane[0],self.screen_height],[self.x+self.road_width*lane[1],self.screen_height]],lane[2])
@@ -309,8 +297,8 @@ screen = pygame.display.set_mode((screen_width,screen_height))
 pygame.display.set_caption("pyweek33 - Menace of the Streets")
 clock= pygame.time.Clock()
 done = False
-bob=pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
-bob=pygame.mixer.music.load("./assets/music/before the disaster.mp3")
+pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
+# pygame.mixer.music.load("./assets/music/before the disaster.mp3")
 pygame.mixer.music.play(-1,0.0)
 pygame.mixer.music.set_volume(1)
 
