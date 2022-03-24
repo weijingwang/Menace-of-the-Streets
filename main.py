@@ -52,17 +52,18 @@ class Obstacle(pygame.sprite.Sprite):
         
         self.scored = False
         self.score = 0
-    
-    def update(self,pos,scale,current_lane,remove_this):
+
+    def update(self,pos,scale,is_alive,turn_house_on):
         # print(self.my_lane)
         # print(self.scale)
         keys = pygame.key.get_pressed()
         # if remove_this == self.my_lane:
         #     print("killed",self.my_lane)
         #     self.kill()
-        if scale>800:
-            self.is_kill=True
+        if is_alive==0:
             self.kill()
+        if turn_house_on==1:
+            self.original_image = self.house_on
         # if self.scale>800 and self.my_lane == current_lane:
         #     print("DIE")
         #     quit()
@@ -199,7 +200,10 @@ class Game():
         self.obst_new_xR = [0,0,0,0,0,0]
         self.obst_width = [0,0,0,0,0,0]
 
-        self.lane_data_processed = [0,0,0,0,0,0]
+        self.obst_is_alive = [0,0,0,0,0,0]
+        self.obst_house_on = [0,0,0,0,0,0]
+        self.obst_can_turn_house_on = [1,1,1,1,1,1]
+
 
 
     def update_lane(self):
@@ -263,12 +267,12 @@ class Game():
         self.lane0.draw(self.screen)
         self.lane5.draw(self.screen)
 
-        self.lane0.update(self.obst_pos[0],self.obst_scale[0],self.current_lane,self.the_one_who_will_be_removed)
-        self.lane1.update(self.obst_pos[1],self.obst_scale[1],self.current_lane,self.the_one_who_will_be_removed)
-        self.lane2.update(self.obst_pos[2],self.obst_scale[2],self.current_lane,self.the_one_who_will_be_removed)
-        self.lane3.update(self.obst_pos[3],self.obst_scale[3],self.current_lane,self.the_one_who_will_be_removed)
-        self.lane4.update(self.obst_pos[4],self.obst_scale[4],self.current_lane,self.the_one_who_will_be_removed)
-        self.lane5.update(self.obst_pos[5],self.obst_scale[5],self.current_lane,self.the_one_who_will_be_removed)
+        self.lane0.update(self.obst_pos[0],self.obst_scale[0],self.obst_is_alive[0],self.obst_house_on[0])
+        self.lane1.update(self.obst_pos[1],self.obst_scale[1],self.obst_is_alive[1],self.obst_house_on[1])
+        self.lane2.update(self.obst_pos[2],self.obst_scale[2],self.obst_is_alive[2],self.obst_house_on[2])
+        self.lane3.update(self.obst_pos[3],self.obst_scale[3],self.obst_is_alive[3],self.obst_house_on[3])
+        self.lane4.update(self.obst_pos[4],self.obst_scale[4],self.obst_is_alive[4],self.obst_house_on[4])
+        self.lane5.update(self.obst_pos[5],self.obst_scale[5],self.obst_is_alive[5],self.obst_house_on[5])
 
         # self.screen.blit(pygame.transform.scale(self.evil_twin,(int(self.screen_width/2),self.screen_height)),(0,0))
         # self.screen.blit(pygame.transform.scale(self.mayor_twin,(int(self.screen_width/2),self.screen_height)),(int(self.screen_width/2),0))
@@ -276,21 +280,25 @@ class Game():
         pygame.draw.rect(self.screen,"black",(0,620,1280,100))
         self.screen.blit(pygame.transform.scale(self.image,(screen_width,screen_height)),(0,0))
 
-    def calculate_obstacle_pos(self,remove_this):
+    def calculate_obstacle_pos(self):
         for x in range(0,6):
             keys = pygame.key.get_pressed()
-            # if remove_this == my_lane:
-            #     print("killed",my_lane)
-            #     self.kill()
-            if self.obst_scale[x]>800:
+
+            if self.obst_scale[x]>800:#kill sprite. RESET
                 self.obst_pos[x] = [1280/2,720/3]
                 self.obst_scale[x] = 0
                 self.obst_speed[x]=0.0001
                 self.obst_accel[x]=0.005
                 self.obst_new_accel[x]=0.01
-                print("reset")
-            if self.obst_scale[x]>800 and x == self.current_lane:
-                remove_this = True
+                self.obst_is_alive[x]=0
+                self.obst_can_turn_house_on[x]=1
+                self.obst_house_on[x]=0
+
+            if self.the_one_who_will_be_removed == x:#prevent 4 cars in a row on road by removing one random one
+                self.obst_is_alive[x]=0
+
+            # if self.obst_scale[x]>800 and x == self.current_lane:
+            #     remove_this = True
                 # quit()
             if keys[pygame.K_SPACE]:
                 self.obst_speed[x] += self.obst_new_accel[x]*5
@@ -317,21 +325,22 @@ class Game():
             self.obst_new_xR[x] = (1280/2)-self.obst_delta_x_nowR[x]
             self.obst_width[x] = abs(self.obst_new_xL[x]-self.obst_new_xR[x])
             self.obst_scale[x] =self.obst_width[x]#======================================================================================
-            
+            # print(self.obst_is_alive)
             # self.image = pygame.transform.scale(original_image, (scale, int(scale*height_multiplier)))
             # self.rect = self.image.get_rect(midbottom = pos)
 
-            # if type == 0 or type ==5:
-            #     if self.obst_scale<800 and self.obst_scale >100:# and can_turn_house_on == True:
-            #         # print("do it now")
-            #         if (my_lane == 0 and self.current_lane ==1) or (my_lane == 5 and self.current_lane ==4):
-            #             if keys[pygame.K_SPACE]:
-            #                 # self.kill()
-            #                 # self.original_image = self.house_on
-            #                 # print(True)
-            #                 # self.scored=True
-            #                 # self.can_turn_house_on = False
-            #                 self.my_score+=1
+            if x == 0 or x ==5:
+                if self.obst_scale[x]<800 and self.obst_scale[x] >100:# and can_turn_house_on == True:
+                    # print("do it now")
+                    if (x == 0 and self.current_lane ==1) or (x == 5 and self.current_lane ==4):
+                        if keys[pygame.K_SPACE]:
+                            # print("yes")
+                            if self.obst_can_turn_house_on[x]==1:
+                                self.obst_house_on[x]=1
+                                self.obst_can_turn_house_on[x]=0
+
+                            # self.can_turn_house_on = False
+                            # self.my_score+=1
             # print(self.scored,"in loops"+str(self.score))
         # print(self.obst_pos,self.obst_scale,self.my_score)
             # return(self.obst_pos,self.obst_scale,self.my_score)
@@ -339,7 +348,7 @@ class Game():
     def spawn_obstacles(self):
         # print(self.obst_scale)
         current_obstacles = len(self.lane0)+len(self.lane1)+len(self.lane2)+len(self.lane3)+len(self.lane4)+len(self.lane5)
-        self.calculate_obstacle_pos(None)
+        self.calculate_obstacle_pos()
 
         if current_obstacles == 0:
             self.the_one_who_will_be_removed = None
@@ -348,6 +357,7 @@ class Game():
                 if len(self.lane_occupant[x]) ==0 and random.choice((True,False))==True:
                     # print(self.obst_pos[x])
                     test = Obstacle(x,x)
+                    self.obst_is_alive[x]=1
                     self.lane_occupant[x].add(test)
                     
             if len(self.lane_occupant[1]) == 1 and len(self.lane_occupant[2]) == 1 and len(self.lane_occupant[3]) == 1 and len(self.lane_occupant[4]) == 1:
