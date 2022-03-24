@@ -338,13 +338,15 @@ class Game():
                             if self.obst_can_turn_house_on[x]==1:
                                 self.obst_house_on[x]=1
                                 self.obst_can_turn_house_on[x]=0
+                                self.my_score+=1
+                                
 
                             # self.can_turn_house_on = False
                             # self.my_score+=1
             # print(self.scored,"in loops"+str(self.score))
         # print(self.obst_pos,self.obst_scale,self.my_score)
             # return(self.obst_pos,self.obst_scale,self.my_score)
-
+            print(self.my_score)
     def spawn_obstacles(self):
         # print(self.obst_scale)
         current_obstacles = len(self.lane0)+len(self.lane1)+len(self.lane2)+len(self.lane3)+len(self.lane4)+len(self.lane5)
