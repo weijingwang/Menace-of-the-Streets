@@ -1,4 +1,3 @@
-from multiprocessing.spawn import spawn_main
 import pygame
 import pygame.gfxdraw
 import os
@@ -32,7 +31,7 @@ class Background(pygame.sprite.Sprite):
         
 
 class Obstacle(pygame.sprite.Sprite):
-    def __init__(self,current_lane,lane_data,type,my_lane) -> None:
+    def __init__(self,type,my_lane) -> None:
         super().__init__()
         self.my_lane = my_lane
         self.image_link = None
@@ -50,11 +49,12 @@ class Obstacle(pygame.sprite.Sprite):
             self.height_multiplier = 0.5
 
         elif self.type == 0 or self.type == 5:
-            self.image_link = "./assets/house_off.png"
+            self.image_link = ("./assets/house_off.png")
             self.height_multiplier = 3
-
         elif self.type == 6:
             self.image = "./assets/empty.png"
+
+        self.house_on = pygame.image.load("./assets/house_on.png").convert_alpha()
 
 
         self.image = pygame.image.load("./assets/car_b.png").convert_alpha()
@@ -66,14 +66,12 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.midbottom = 1280/2,720/3
 
-        self.current_lane = current_lane
-        self.lane_data = lane_data
-
         self.pos = [1280/2,720/3]
 
 
         self.speed =0.0001
         self.accel = 0.005
+        self.new_accel = 0.005
         # self.z = z
 
 
@@ -82,13 +80,24 @@ class Obstacle(pygame.sprite.Sprite):
         self.is_kill = False
         
 
-    def update(self,lane_data):
+    def update(self,lane_data,current_lane):
         # print(self.my_lane)
+        keys = pygame.key.get_pressed()
         if self.scale>800:
             self.is_kill=True
             self.kill()
-
-
+        if keys[pygame.K_SPACE]:
+            self.speed += self.accel*5
+            # print("YESSSSSS++++++++++")
+        if self.type == 0 or self.type ==5:
+            if self.scale<800 and self.scale >100:
+                # print("do it now")
+                if (self.my_lane == 0 and current_lane ==1) or (self.my_lane == 5 and current_lane ==4):
+                    if keys[pygame.K_SPACE]:
+                        # self.kill()
+                        self.original_image = self.house_on
+                        # print("YESSSSSS++++++++++")
+        print(current_lane)
         delta_y_f = 240-720
         delta_x_f = (1280/2)-(((lane_data[self.my_lane][1]-lane_data[self.my_lane][0])/2)+lane_data[self.my_lane][0])
         delta_ratio = delta_x_f/delta_y_f
@@ -153,14 +162,7 @@ class Game():
             [5,6,(198,248,198)]
         ]
 
-        self.lane_occupant = [
-            False,
-            False,
-            False,
-            False,
-            False,
-            False
-        ]
+
 
 
         # pygame.gfxdraw.filled_polygon(self.screen,[(self.x0,self.y0),[self.x+self.road_width*lane[0],self.screen_height],[self.x+self.road_width*lane[1],self.screen_height]],lane[2])
@@ -176,15 +178,23 @@ class Game():
 
 
         #OBSTACLES
-        self.house_group = pygame.sprite.Group()
-        self.car_f_group = pygame.sprite.Group()
-        self.car_b_group = pygame.sprite.Group()
+        # self.house_group = pygame.sprite.Group()
+        # self.car_f_group = pygame.sprite.Group()
+        # self.car_b_group = pygame.sprite.Group()
+
+        self.lane0 = pygame.sprite.Group()
+        self.lane1 = pygame.sprite.Group()
+        self.lane2 = pygame.sprite.Group()
+        self.lane3 = pygame.sprite.Group()
+        self.lane4 = pygame.sprite.Group()
+        self.lane5 = pygame.sprite.Group()
+        self.lane_occupant = [self.lane0,self.lane1,self.lane2,self.lane3,self.lane4,self.lane5]
         # self.my_backgroundL = Background(5,"left",1280/2)
         # self.my_backgroundR = Background(5,"right",1280/2)
         # self.my_backgroundL2 = Background(5,"right",0)
         # self.my_backgroundR2 = Background(5,"left",1280)
 
-        self.background_group = pygame.sprite.Group()
+        # self.background_group = pygame.sprite.Group()
         # self.background_group.add(self.my_backgroundL)
         # self.background_group.add(self.my_backgroundR)
         # self.background_group.add(self.my_backgroundL2)
@@ -238,13 +248,13 @@ class Game():
 
         # print(self.lane_data)
     def run(self):
-        screen.fill((20,24,82))
+        self.screen.fill((20,24,82))
         self.screen.blit(pygame.transform.scale(self.stars_bg,(screen_width,screen_height)),(0,0))
 
         pygame.draw.rect(self.screen,(14,47,38),(0,240,1280,480))
         # self.screen.blit(pygame.transform.scale(self.cityback,(screen_width,screen_height)),(0,0))
-        self.background_group.draw(self.screen)
-        self.background_group.update()
+        # self.background_group.draw(self.screen)
+        # self.background_group.update()
         # random_x = randrange(-3,3)
         # random_y = randrange(-3,3)
 
@@ -252,16 +262,22 @@ class Game():
             pygame.gfxdraw.filled_polygon(self.screen,[(self.x0,self.y0),[self.x+self.road_width*lane[0],self.screen_height],[self.x+self.road_width*lane[1],self.screen_height]],lane[2])
 
 
-        self.car_f_group.draw(self.screen)
-        self.car_b_group.draw(self.screen)
+        self.lane1.draw(self.screen)
+        self.lane2.draw(self.screen)
+        self.lane3.draw(self.screen)
+        self.lane4.draw(self.screen)
         self.screen.blit(pygame.transform.scale(self.fog,(self.screen_width,self.screen_height)),(0,0))
-        self.house_group.draw(self.screen)
+        self.lane0.draw(self.screen)
+        self.lane5.draw(self.screen)
 
-        a=self.house_group.update(self.lane_data)
-        b=self.car_f_group.update(self.lane_data)
-        c=self.car_b_group.update(self.lane_data)
-        # print(a,b,c)
+        self.lane0.update(self.lane_data,self.current_lane)
+        self.lane1.update(self.lane_data,self.current_lane)
+        self.lane2.update(self.lane_data,self.current_lane)
+        self.lane3.update(self.lane_data,self.current_lane)
+        self.lane4.update(self.lane_data,self.current_lane)
+        self.lane5.update(self.lane_data,self.current_lane)
 
+        print(self.current_lane)
         # self.screen.blit(pygame.transform.scale(self.evil_twin,(int(self.screen_width/2),self.screen_height)),(0,0))
         # self.screen.blit(pygame.transform.scale(self.mayor_twin,(int(self.screen_width/2),self.screen_height)),(int(self.screen_width/2),0))
 
@@ -274,26 +290,22 @@ class Game():
             self.z+=1
 
     def spawn_obstacles(self):
-        current_obstacles = len(self.house_group)+len(self.car_f_group)+len(self.car_b_group)
-        print(self.lane_occupant)
+        current_obstacles = len(self.lane0)+len(self.lane1)+len(self.lane2)+len(self.lane3)+len(self.lane4)+len(self.lane5)
+        # print(self.lane_occupant)
         if current_obstacles == 0:
-            for count, occupant in enumerate(self.lane_occupant):
-                if occupant==False: #and random.choice((True,False))==True:
-                        # choose_type = random.choice(["car_b","car_f","house"])
-                    test = Obstacle(self.current_lane,self.lane_data,count,count)
-                    if count == 0 or count ==5:
-                        self.house_group.add(test)
-
-                    elif count == 1 or count ==2:
-                        self.car_f_group.add(test) 
-                    elif count ==3 or count == 4:
-                        self.car_b_group.add(test) 
-                    self.lane_occupant[count] = True
+            for count, x in enumerate(range(0,6)):
+                # print(count)
+                if len(self.lane_occupant[x]) ==0 and random.choice((True,False))==True:
+                    test = Obstacle(x,x)
+                    self.lane_occupant[x].add(test)
+            if len(self.lane_occupant[1]) == 1 and len(self.lane_occupant[2]) == 1 and len(self.lane_occupant[3]) == 1 and len(self.lane_occupant[4]) == 1:
+                the_one_who_will_be_removed = random.choice((1,2,3,4))
+                print("remove one")
         
-        self.z=0
+        # self.z+=0
 
         # print(self.z)
-        print(current_obstacles)
+        # print(current_obstacles)
                 
 
 
@@ -306,6 +318,7 @@ pygame.init()
 screen_width = 1280
 screen_height = 720
 screen = pygame.display.set_mode((screen_width,screen_height))
+pygame.display.set_caption("pyweek33 - Menace of the Streets")
 clock= pygame.time.Clock()
 done = False
 # bob=pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
