@@ -3,31 +3,6 @@ import pygame.gfxdraw
 import os
 import random
 
-class Background(pygame.sprite.Sprite):
-    def __init__(self,scroll_speed,direction,x):
-        super().__init__()
-        self.x = x
-        self.pos =[self.x,720/3]
-        self.scroll_speed = scroll_speed
-        self.image =pygame.image.load("./assets/cityback.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image,(int(1280/2),int(720/4)))
-        self.rect = self.image.get_rect()
-        self.rect.midbottom = self.pos
-        self.direction = direction
-        
-
-    def update(self):
-        if self.direction == "right":
-            self.pos[0]+=self.scroll_speed
-            if self.pos[0]>1280:
-                self.pos[0]=self.x
-            self.rect = self.image.get_rect(midbottom = self.pos)
-        if self.direction =="left":
-            self.pos[0]-=self.scroll_speed
-            if self.pos[0]<0:
-                self.pos[0]=self.x
-            self.rect = self.image.get_rect(midbottom = self.pos)
-
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self,type,my_lane) -> None:
         super().__init__()
@@ -72,9 +47,12 @@ class Obstacle(pygame.sprite.Sprite):
         self.new_accel = 0.01
 
         self.is_kill = False
-        self.is_house_on = False
+        self.can_turn_house_on = True
+        # global_score += 1
         
-
+        self.scored = False
+        self.score = 0
+    
     def update(self,lane_data,current_lane,remove_this):
         # print(self.my_lane)
         keys = pygame.key.get_pressed()
@@ -121,16 +99,17 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom = self.pos)
 
         if self.type == 0 or self.type ==5:
-            if self.scale<800 and self.scale >100 and self.image:
+            if self.scale<800 and self.scale >100 and self.image and self.can_turn_house_on == True:
                 # print("do it now")
                 if (self.my_lane == 0 and current_lane ==1) or (self.my_lane == 5 and current_lane ==4):
                     if keys[pygame.K_SPACE]:
                         # self.kill()
                         self.original_image = self.house_on
-                        self.is_house_on = True
-                        # print("YESSSSSS++++++++++")
-        if self.is_house_on ==True:
-            return True
+                        # print(True)
+                        self.scored=True
+                        self.can_turn_house_on = False
+                        self.score+=1
+        print(self.scored,"in loops"+str(self.score))
 
 class Game():
     def __init__(self,current_lane,screen):
@@ -193,6 +172,7 @@ class Game():
 
         self.the_one_who_will_be_removed = 0
 
+        self.my_score = 0
 
     def update_lane(self):
         for event in pygame.event.get():
@@ -272,17 +252,16 @@ class Game():
 
     def spawn_obstacles(self):
         current_obstacles = len(self.lane0)+len(self.lane1)+len(self.lane2)+len(self.lane3)+len(self.lane4)+len(self.lane5)
-        # print(self.lane_occupant)
+
         if current_obstacles == 0:
             self.the_one_who_will_be_removed = None
-            for count, x in enumerate(range(0,6)):
-                # print(count)
+            for x in range(0,6):
                 if len(self.lane_occupant[x]) ==0 and random.choice((True,False))==True:
                     test = Obstacle(x,x)
                     self.lane_occupant[x].add(test)
+                    
             if len(self.lane_occupant[1]) == 1 and len(self.lane_occupant[2]) == 1 and len(self.lane_occupant[3]) == 1 and len(self.lane_occupant[4]) == 1:
                 self.the_one_who_will_be_removed = random.choice((1,2,3,4))
-                # print("remove one",self.the_one_who_will_be_removed) 
         
 
                 
@@ -294,13 +273,13 @@ pygame.init()
 screen_width = 1280
 screen_height = 720
 screen = pygame.display.set_mode((screen_width,screen_height))
-pygame.display.set_caption("pyweek33 - Menace of the Streets")
+pygame.display.set_caption("pyweek33--Menace of the Streets")
 clock= pygame.time.Clock()
 done = False
-pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
-# pygame.mixer.music.load("./assets/music/before the disaster.mp3")
-pygame.mixer.music.play(-1,0.0)
-pygame.mixer.music.set_volume(1)
+# pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
+# # pygame.mixer.music.load("./assets/music/before the disaster.mp3")
+# pygame.mixer.music.play(-1,0.0)
+# pygame.mixer.music.set_volume(1)
 
 my_game = Game(4,screen)
 while not done:
