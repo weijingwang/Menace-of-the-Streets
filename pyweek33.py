@@ -86,8 +86,14 @@ class Obstacle(pygame.sprite.Sprite):
         if self.scale>800:
             self.is_kill=True
             self.kill()
+        if self.scale>800 and self.my_lane == current_lane:
+            print("DIE")
+            quit()
+
         if keys[pygame.K_SPACE]:
-            self.speed += self.accel*5
+            self.speed += self.new_accel*5
+            self.new_accel+=0.001
+        print(self.new_accel)
             # print("YESSSSSS++++++++++")
         if self.type == 0 or self.type ==5:
             if self.scale<800 and self.scale >100:
@@ -97,7 +103,7 @@ class Obstacle(pygame.sprite.Sprite):
                         # self.kill()
                         self.original_image = self.house_on
                         # print("YESSSSSS++++++++++")
-        print(current_lane)
+        # print(current_lane)
         delta_y_f = 240-720
         delta_x_f = (1280/2)-(((lane_data[self.my_lane][1]-lane_data[self.my_lane][0])/2)+lane_data[self.my_lane][0])
         delta_ratio = delta_x_f/delta_y_f
@@ -277,17 +283,17 @@ class Game():
         self.lane4.update(self.lane_data,self.current_lane)
         self.lane5.update(self.lane_data,self.current_lane)
 
-        print(self.current_lane)
+        # print(self.current_lane)
         # self.screen.blit(pygame.transform.scale(self.evil_twin,(int(self.screen_width/2),self.screen_height)),(0,0))
         # self.screen.blit(pygame.transform.scale(self.mayor_twin,(int(self.screen_width/2),self.screen_height)),(int(self.screen_width/2),0))
 
         pygame.draw.rect(self.screen,"black",(0,620,1280,100))
         self.screen.blit(pygame.transform.scale(self.image,(screen_width,screen_height)),(0,0))
 
-    def move_player(self):
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            self.z+=1
+    # def move_player(self):
+    #     keys = pygame.key.get_pressed()
+    #     if keys[pygame.K_SPACE]:
+    #         self.z+=1
 
     def spawn_obstacles(self):
         current_obstacles = len(self.lane0)+len(self.lane1)+len(self.lane2)+len(self.lane3)+len(self.lane4)+len(self.lane5)
@@ -321,14 +327,14 @@ screen = pygame.display.set_mode((screen_width,screen_height))
 pygame.display.set_caption("pyweek33 - Menace of the Streets")
 clock= pygame.time.Clock()
 done = False
-# bob=pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
-# bob=pygame.mixer.music.load("./assets/music/before the disaster.mp3")
-# pygame.mixer.music.play(-1,0.0)
-# pygame.mixer.music.set_volume(1)
-# print(bob)
+bob=pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
+bob=pygame.mixer.music.load("./assets/music/before the disaster.mp3")
+pygame.mixer.music.play(-1,0.0)
+pygame.mixer.music.set_volume(1)
+
 my_game = Game(4,screen)
 while not done:
-    my_game.move_player()
+    # my_game.move_player()
     my_game.update_lane()
     my_game.spawn_obstacles()
     my_game.run()
