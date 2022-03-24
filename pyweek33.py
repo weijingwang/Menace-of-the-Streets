@@ -328,7 +328,7 @@ pygame.display.set_caption("pyweek33 - Menace of the Streets")
 clock= pygame.time.Clock()
 done = False
 bob=pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
-bob=pygame.mixer.music.load("./assets/music/before the disaster.mp3")
+# bob=pygame.mixer.music.load("./assets/music/before the disaster.mp3")
 pygame.mixer.music.play(-1,0.0)
 pygame.mixer.music.set_volume(1)
 
