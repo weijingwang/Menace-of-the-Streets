@@ -312,6 +312,7 @@ class Game():
         self.screen.blit(pygame.transform.scale(self.image,(screen_width,screen_height)),(0,0))
 
     def calculate_obstacle_pos(self):
+
         for x in range(0,6):
             keys = pygame.key.get_pressed()
 
@@ -387,6 +388,7 @@ class Game():
         # print(self.obst_scale)
         current_obstacles = len(self.lane0)+len(self.lane1)+len(self.lane2)+len(self.lane3)+len(self.lane4)+len(self.lane5)
         self.calculate_obstacle_pos()
+        self.obst_accel_og+=0.00001
 
         if current_obstacles == 0:
             self.the_one_who_will_be_removed = None
