@@ -169,14 +169,15 @@ class Game():
                     self.current_lane-=1
                     self.next_x = self.current_lane*-self.road_width
                     self.move_left = True
-                elif event.key == pygame.K_SPACE:
+                if event.key == pygame.K_SPACE:
                     self.sound_car_rev_loops = -1
                     self.channel1.play(self.sound_car_rev,self.sound_car_rev_loops)
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
                     self.image = self.POV_car_M
                 elif event.key == pygame.K_SPACE:
-                    self.channel1.fadeout(1000)
+                    self.channel1.fadeout(100)
+                    # self.channel1.stop()
                     self.sound_car_rev_loops = 0
 
         if self.move_right==True:
