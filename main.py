@@ -51,22 +51,21 @@ class Game():
         self.POV_car_M = pygame.image.load("./assets/POV_car_M.png").convert_alpha()
         self.POV_car_R = pygame.image.load("./assets/POV_car_R.png").convert_alpha()
         self.fog = pygame.image.load("./assets/fog.png").convert_alpha()
-
-
+        self.lose_image = pygame.image.load("./assets/death.png").convert_alpha()
         self.image = self.POV_car_M
         #MUSIC
-        pygame.mixer.music.load("./assets/music/i drivin and they hatin.mp3")
-        pygame.mixer.music.play(-1,0.0)
-        pygame.mixer.music.set_volume(1)
+        self.play_music = True
         #SOUND
         self.channel1 = pygame.mixer.Channel(1)
         self.channel2 = pygame.mixer.Channel(2)
+        self.channel3 = pygame.mixer.Channel(3)
         self.channel1.set_volume(0.75)
         self.channel2.set_volume(0.25)
+        self.channel3.set_volume(2)
         self.sound_car_rev = pygame.mixer.Sound("./assets/sound/car_rev.ogg")
         self.sound_car_rev_loops = 0
         self.sound_elaphant = pygame.mixer.Sound("./assets/sound/dog.ogg")
-
+        self.crash_small = pygame.mixer.Sound("./assets/sound/crash_small.ogg")
 
         #BASIC
         self.screen = screen
@@ -76,7 +75,6 @@ class Game():
         self.x0 = self.screen_width/2
         self.road_width=self.screen_width
         self.z = 0
-
 
         #LANES
         self.current_lane =current_lane
@@ -93,7 +91,6 @@ class Game():
             [4,5,(165,165,165)],
             [5,6,(198,248,198)]
         ]
-
 
         self.lane_data = [
             [self.x+self.road_width*self.lane_array[0][0],self.x+self.road_width*self.lane_array[0][1]],
@@ -153,6 +150,7 @@ class Game():
         self.scoreText = self.scoreFont.render("score is: "+str(self.my_score), True,("white"))
 
         self.lose = False
+        self.retry_ok = False
 
     def update_lane(self):
         for event in pygame.event.get():
@@ -204,7 +202,12 @@ class Game():
             [self.x+self.road_width*self.lane_array[5][0],self.x+self.road_width*self.lane_array[5][1]]
         ]
 
-    def run(self):
+    def draw(self):
+        if self.play_music==True:
+            pygame.mixer.music.load("./assets/music/i drivin and they hatin.mp3")
+            pygame.mixer.music.play(-1,0.0)
+            pygame.mixer.music.set_volume(1)
+            self.play_music=False
         self.screen.fill((20,24,82))
         self.screen.blit(pygame.transform.scale(self.stars_bg,(screen_width,screen_height)),(0,0))
 
@@ -251,9 +254,9 @@ class Game():
                 self.obst_is_alive[x]=0
             if self.obst_is_alive[x]:
                 if self.obst_scale[x]>800 and x == self.current_lane:
+                    print("music stopped")
+                    self.channel3.play(self.crash_small)
                     self.lose = True
-
-
 
             if keys[pygame.K_SPACE]:
                 self.obst_speed[x] += self.obst_new_accel[x]*5
@@ -296,14 +299,7 @@ class Game():
                                     self.channel2.play(self.sound_elaphant)
                                     # self.channel2.fadeout(0)
                                     self.my_score+=1
-                                
 
-                            # self.can_turn_house_on = False
-                            # self.my_score+=1
-            # print(self.scored,"in loops"+str(self.score))
-        # print(self.obst_pos,self.obst_scale,self.my_score)
-            # return(self.obst_pos,self.obst_scale,self.my_score)
-            # print(self.my_score)
     def spawn_obstacles(self):
         # print(self.obst_scale)
         current_obstacles = len(self.lane0)+len(self.lane1)+len(self.lane2)+len(self.lane3)+len(self.lane4)+len(self.lane5)
@@ -324,12 +320,50 @@ class Game():
                 self.the_one_who_will_be_removed = random.choice((1,2,3,4))
         for x in range(0,6):
             pass
-    def have_you_lost(self):
-        return(self.lose)
+    # def have_you_lost(self):
+    #     return(self.lose)
                 
     def draw_score(self):
         self.scoreText = self.scoreFont.render(str(self.my_score)+" homes disturbed", True,("white"))
         self.screen.blit(self.scoreText,(900,50))
+
+    def show_lose(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                self.retry_ok = True
+            if event.type == pygame.KEYUP and self.retry_ok==True and event.key == pygame.K_RETURN:
+                self.my_score = 0
+                self.obst_pos = [[1280/2,720/3],[1280/2,720/3],[1280/2,720/3],[1280/2,720/3],[1280/2,720/3],[1280/2,720/3]]
+                self.obst_scale = [0,0,0,0,0,0]
+                self.obst_speed=[0.0001,0.0001,0.0001,0.0001,0.0001,0.0001]
+                self.obst_accel=[0.005,0.005,0.005,0.005,0.005,0.005]
+                self.obst_new_accel=[0.01,0.01,0.01,0.01,0.01,0.01]
+                self.obst_is_alive = [0,0,0,0,0,0]
+                self.obst_house_on = [0,0,0,0,0,0]
+                self.obst_can_turn_house_on = [1,1,1,1,1,1]
+                self.play_music = True
+                self.lose = False
+                self.retry_ok = False
+        print(self.retry_ok)
+                    
+
+                
+
+        pygame.mixer.music.stop()
+        self.channel1.fadeout(100)
+        self.screen.blit(self.lose_image,(0,0))
+
+    def run(self):
+        if self.lose == True:
+            self.show_lose()
+        else:
+            self.update_lane()
+            self.spawn_obstacles()
+            self.draw()
+            self.draw_score()
+
 
 class Text(pygame.sprite.Sprite):
     def __init__(self,screen,message,pos,size,bottom) -> None:
@@ -385,7 +419,7 @@ class GameTitle():
         self.light_2 = False
 
         self.move_text_pos=[1280/2,10]
-        self.instructions = Text(self.screen,"Press Left or Right to select. Press any button to continue.",self.move_text_pos,20,True)
+        self.instructions = Text(self.screen,"Press Left or Right to select. Press Space to continue.",self.move_text_pos,20,True)
         self.moving_text_group = pygame.sprite.Group()
         self.moving_text_group.add(self.instructions)
 
@@ -398,13 +432,14 @@ class GameTitle():
                     self.select +=1
                 elif event.key == pygame.K_LEFT:
                     self.select -=1
-                elif self.select==0:
-                    return(0)
+                if event.key ==pygame.K_SPACE:
+                    if self.select==0:
+                        return(0)
 
-                elif self.select==1:
-                    return(1)
-                elif self.select==2:
-                    return(2)
+                    elif self.select==1:
+                        return(1)
+                    elif self.select==2:
+                        return(2)
         if self.select >= 2:
             self.select=2
         if self.select <= 0:
@@ -465,9 +500,13 @@ class Story():
         self.music = "./assets/music/before the disaster.mp3"
         self.music_played=True
         self.music_can_switch =True
-        pygame.mixer.music.load(self.music)
-        pygame.mixer.music.play(-1,0.0)
-        pygame.mixer.music.set_volume(0.75)
+        self.play_music = True
+
+
+        self.sound_car_rev = pygame.mixer.Sound("./assets/sound/car_rev.ogg")
+
+
+
         self.clock = pygame.time.Clock()
         self.count = 0
         self.empty = pygame.image.load("./assets/empty.png").convert_alpha()
@@ -502,11 +541,11 @@ class Story():
         self.text_speaker_group.add(self.speaker_text)
         self.message_group.add(self.message_text)
         self.current_text = [
-            ["","Press any button to continue"],
+            ["","Press Space to continue"],
             ["","It was just like any other peaceful and quiet night in Mr. Mayor's city..."],
             [" ","and the dear subjects who are true and loyal are about sleep. But not before Mr. Mayor finishes talking!"],
             ["Mr. Mayor","Dear my true and loyal subjects if you will."],
-            ["Mr. Mayor","You may spam buttons to skip me, but please. I implore you to lend me an ear..."],#INDEX 4
+            ["Mr. Mayor","You may spam Space to skip me, but please. I implore you to lend me an ear..."],#INDEX 4
 
             ["Mr. Mayor","As many of you should know, today is my birthday..."],
             ["loyal subjects","mr. mayor, that is so great. happy birthday mr mayor. we appreciate you"],
@@ -540,11 +579,11 @@ class Story():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 # self.intro_town_stop = True
                 self.check_keydown = True
 
-            if event.type == pygame.KEYUP and self.check_keydown == True and self.count<18:
+            if event.type == pygame.KEYUP and self.check_keydown == True and self.count<18 and event.key == pygame.K_SPACE:
                 self.count+=1
                 self.check_keydown=False
             # print(str(self.count)+" is the storty count")
@@ -595,6 +634,7 @@ class Story():
             self.subject1 = self.evil_twin
             self.subject1_pos[0]=0  
         elif self.count ==18:
+            # pygame.mixer.Sound.play(self.sound_car_rev)
             pygame.mixer.music.fadeout(3000)
             self.subject1 = self.empty
             self.subject2_pos[0]-=5-self.fib_accel
@@ -604,6 +644,11 @@ class Story():
             self.alphaSurface.set_alpha(self.alph_count)
 
     def run(self):
+        if self.play_music==True:
+            pygame.mixer.music.load(self.music)
+            pygame.mixer.music.play(-1,0.0)
+            pygame.mixer.music.set_volume(0.75)
+            self.play_music = False
         self.update()
         self.get_input()
         self.see_city()
@@ -646,6 +691,10 @@ fibbari_car = pygame.transform.scale(fibbari_car, (1280, 720))
 stars = pygame.image.load("./assets/stars.png").convert_alpha()
 stars = pygame.transform.scale(stars, (1280, 720))
 about = pygame.image.load("./assets/about.png").convert_alpha()
+lose_image = pygame.image.load("./assets/death.png").convert_alpha()
+#SOUND
+crash_small = pygame.mixer.Sound("./assets/sound/crash_small.ogg")
+
 
 clock= pygame.time.Clock()
 title_done = False
@@ -655,7 +704,6 @@ challenge_done = True
 intro_done = True
 tutorial_done = True
 game_done = True
-
 my_title = GameTitle(screen)
 done_0 = False
 while not done_0:
@@ -678,7 +726,7 @@ while not done_0:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 about_done = True
                 title_done = False
         screen.fill("black")
@@ -690,12 +738,7 @@ while not done_0:
 
 challenge = Game(4,screen)
 while not challenge_done:
-    challenge.update_lane()
-    challenge.spawn_obstacles()
     challenge.run()
-    challenge.draw_score()
-    if challenge.have_you_lost() == True:
-        challenge_done = True
     clock.tick(60)
     pygame.display.update()
 
@@ -712,26 +755,18 @@ while not intro_done:
 
 tutorial = Game(4,screen)
 while not tutorial_done:
-    tutorial.update_lane()
-    tutorial.spawn_obstacles()
     tutorial.run()
-    tutorial.draw_score()
-    if tutorial.have_you_lost() == True:
-        tutorial_done = True
     clock.tick(60)
     pygame.display.update()
 
 
 game = Game(4,screen)
 while not game_done:
-    game.update_lane()
-    game.spawn_obstacles()
     game.run()
-    game.draw_score()
-    if game.have_you_lost() == True:
-        game_done = True
     clock.tick(60)
     pygame.display.update()
+
+
 
         
 
