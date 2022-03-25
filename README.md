@@ -1,7 +1,7 @@
 # Menace of the Streets
 
 ##Description
-Today is Mayor Mayor Mayor's birthday today and he invites YOU for a toast! But something bad is coming. Maybe it is his EVIL TWIN...... What will happen?????
+Today is Mr. Mayor's birthday today and YOU are invited! But something bad is coming. Maybe it is his EVIL TWIN...... What will happen?????
 
 ##Description2
 A semi 3d dodging car game with story written in Pygame and Python3.
