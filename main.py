@@ -209,11 +209,15 @@ class Game():
         self.lose_text_group1.add(self.lose_text1)
         self.lose_text_group2.add(self.lose_text2)
         self.lose_text_group3.add(self.lose_text3)
+
+        self.game_done = False
     def update_lane(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
             if event.type == pygame.KEYDOWN:
+                if event.key==pygame.K_RETURN and self.game_type==1:
+                    self.game_done=True
                 if event.key == pygame.K_RIGHT and self.move_left == False and self.current_lane!=5:
                     self.image=self.POV_car_R
                     self.current_lane+=1
@@ -259,7 +263,7 @@ class Game():
             [self.x+self.road_width*self.lane_array[5][0],self.x+self.road_width*self.lane_array[5][1]]
         ]
     def draw(self):
-        if self.play_music==True:
+        if self.play_music==True and self.game_type!=2:
             pygame.mixer.music.load("./assets/music/i drivin and they hatin.mp3")
             pygame.mixer.music.play(-1,0.0)
             pygame.mixer.music.set_volume(1)
@@ -360,7 +364,17 @@ class Game():
         self.calculate_obstacle_pos()
         self.obst_accel_og+=0.00001
         if self.game_type == 1:
-            pass
+            if current_obstacles == 0:
+                self.the_one_who_will_be_removed = None
+                for x in range(0,6):
+
+                    if len(self.lane_occupant[x]) ==0 and random.choice((True,False))==True:
+                        if x == 0 or x==5 or x==1:
+                        # print(self.obst_pos[x])
+                            test = Obstacle(x,x)
+                            self.obst_is_alive[x]=1
+                            self.lane_occupant[x].add(test)
+
         else:
             if current_obstacles == 0:
                 self.the_one_who_will_be_removed = None
@@ -377,13 +391,34 @@ class Game():
 
      
     def draw_score(self):
-        self.scoreText = self.scoreFont.render(str(self.my_score)+" homes disturbed", True,("white"))
-        self.screen.blit(self.scoreText,(900,50))
+        if self.game_type==1:#TUTORIAL
+            self.scoreText = self.scoreFont.render('Mind simulation (tutorial)', True,("white"))
+            self.tutorial_text1 = self.scoreFont.render('press UP to to speed up and disturb homes if you are in the adjacent lane ', True,("white"))
+            self.tutorial_text2 = self.scoreFont.render('press LEFT or RIGHT ONCE to change ONE lane', True,("white"))
+            self.tutorial_text3 = self.scoreFont.render('if you CRASH you DIE', True,("white"))
+            self.tutorial_text4 = self.scoreFont.render('press ENTER to start game', True,("white"))
+            self.screen.blit(self.scoreText,(800,50))
+            self.screen.blit(self.tutorial_text1,(50,500))
+            self.screen.blit(self.tutorial_text2,(250,550))
+            self.screen.blit(self.tutorial_text3,(450,600))
+            self.screen.blit(self.tutorial_text4,(400,650))
+        elif self.game_type==2:#GAME
+            self.scoreText = self.scoreFont.render(str(self.my_score)+"/5"+" homes disturbed", True,("white"))
+            self.screen.blit(self.scoreText,(900,50))
+        elif self.game_type==0:#CHALLENGE
+            self.scoreText = self.scoreFont.render(str(self.my_score)+" homes disturbed", True,("white"))
+            self.screen.blit(self.scoreText,(900,50))
+
 
     def go_to_ending(self):
         if self.game_type == 2 and self.my_score >= 5:
+            self.channel1.stop()
+            self.channel2.stop()
+            self.channel3.stop()
+            pygame.mixer.music.stop()
             return(True)
-            
+    def tutorial_to_game(self):
+        return(self.game_done)
 
     def show_lose(self):
         for event in pygame.event.get():
@@ -406,7 +441,7 @@ class Game():
                 self.retry_ok = False
         # print(self.retry_ok)
                     
-        pygame.mixer.music.stop()
+        # pygame.mixer.music.stop()
         self.channel1.fadeout(100)
         self.screen.blit(self.lose_image,(0,0))
         self.lose_text_group1.update("HOBBY is when you buy a NEW car")
@@ -728,16 +763,17 @@ class Ending():
         self.message_group.add(self.message_text)
         self.current_text = [
             ["TWIN MAYOR","I do believe that I have sufficiently exercised my rights of driving ..."],
-            ["TWIN MAYOR","...as to permanently DAMAGE his public IMAGE into an UNSATISFACTORY mayor and a TERRIBLE person."],#INDEX 1
-            ["TWIN MAYOR","I will make short work of you, mr. mayor."],#INDEX 2
+            ["TWIN MAYOR","its time for me to go"],#INDEX 1
+            ["TWIN MAYOR","oops"],#INDEX 2
             ['',''],#index 3
-            ['Mr. Mayor','What in the world...'],
-            ["TWIN MAYOR","I am TWIN MAYOR and I am your twin, mr mayor. Your reputation has been destroyed"],
-            ["TWIN MAYOR","I look exactly the same as you mr mayor..."],
-            ["TWIN MAYOR","...so everyone will have thought that you have drove this car. And what's more, into your home"],#7
-            ["Mr. Mayor","You fiend! I am Mr. Mayor!"]
-
+            ['Mr. Mayor','My dear home! Today is my birthday!'],
+            ["TWIN MAYOR","I never say sorry"],
+            ["Mr. Mayor","you must pay for this young man! You may not leave"],
+            ["TWIN MAYOR","Hi Mr. Mayor. I am your twin. I am TWIN MAYOR"],#7
+            ["Mr. Mayor","TWIN MAYOR, I will have you pay for the damages you have caused on this night."],
+            ["TWIN MAYOR","sorry man I'm broke"]#9
         ]
+
         self.check_keydown = False
 
         self.subject1 = self.empty
@@ -761,7 +797,7 @@ class Ending():
                 # self.intro_town_stop = True
                 self.check_keydown = True
 
-            if event.type == pygame.KEYUP and self.check_keydown == True and self.count<8 and event.key == pygame.K_SPACE and self.can_go_next==True:
+            if event.type == pygame.KEYUP and self.check_keydown == True and self.count<9 and event.key == pygame.K_SPACE and self.can_go_next==True:
                 self.count+=1
                 self.check_keydown=False
             # print(str(self.count)+" is the storty count")
@@ -876,12 +912,14 @@ challenge_done = True
 intro_done = True
 tutorial_done = True
 game_done = True
+end_done = True
 
 my_title = GameTitle(screen)
-intro = Ending(screen)
+intro = Story(screen)
 challenge = Game(4,screen,0)
 tutorial = Game(4,screen,1)
 game = Game(4,screen,2)
+end = Ending(screen)
 
 done_0 = False
 while not done_0:
@@ -914,13 +952,10 @@ while not done_0:
         clock.tick(60)
         pygame.display.update()
 
-
 while not challenge_done:
     challenge.run()
     clock.tick(60)
     pygame.display.update()
-
-
 
 while not intro_done:
     intro.run()
@@ -930,23 +965,28 @@ while not intro_done:
     clock.tick(60)
     pygame.display.update()
 
-
-
 while not tutorial_done:
+    if tutorial.tutorial_to_game()==True:
+        game_done=False
+        tutorial_done=True
     tutorial.run()
     clock.tick(60)
     pygame.display.update()
 
-
-
 while not game_done:
     if game.go_to_ending()==True:
+        end_done=False
         game_done=True
     game.run()
     clock.tick(60)
     pygame.display.update()
 
-
+while not end_done:
+    end.run()
+    if end.intro_finished() == True:
+        end = True
+    clock.tick(60)
+    pygame.display.update()
 
         
 
