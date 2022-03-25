@@ -2,6 +2,54 @@ import pygame
 import pygame.gfxdraw
 import os
 import random
+class Text(pygame.sprite.Sprite):
+    def __init__(self,screen,message,pos,size,bottom) -> None:
+        super().__init__()
+        self.screen = screen
+        self.pos = pos
+        self.size = size
+        self.bottom = bottom
+        self.original_size = self.size
+        self.color=(200,200,200)
+        self.myFont = pygame.font.Font("./assets/font/TanoheSans-Medium.ttf", self.size)
+        self.message = message
+        self.image = self.myFont.render(self.message, 1, self.color)
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+        
+    def update(self,on):
+        self.rect.center = self.pos
+        if on==True:
+            self.color = (130,115,250)
+        elif on==False:
+            self.color = (70,67,78)
+        if self.bottom == True:
+            self.color = (100,97,108)
+        self.image = self.myFont.render(self.message, 1, self.color)
+
+class realText(pygame.sprite.Sprite):
+    def __init__(self,screen,pos,size) -> None:
+        super().__init__()
+        self.screen = screen
+        self.pos = pos
+        self.size = size
+        self.original_size = self.size
+        self.color=(200,200,200)
+        self.myFont = pygame.font.Font("./assets/font/TanoheSans-Medium.ttf", self.size)
+        self.image = self.myFont.render("_", 1, self.color)
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+        
+    def update(self,message):
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+        # if on==True:
+        #     self.color = (130,115,250)
+        # elif on==False:
+        #     self.color = (70,67,78)
+        # if self.bottom == True:
+        #     self.color = (100,97,108)
+        self.image = self.myFont.render(message, 1, self.color)
 
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self,type,my_lane) -> None:
@@ -44,7 +92,8 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom = pos)
 
 class Game():
-    def __init__(self,current_lane,screen):
+    def __init__(self,current_lane,screen,tutorial):
+        self.tutorial = tutorial
         #IMAGES
         self.stars_bg = pygame.image.load("./assets/stars.png").convert_alpha()
         self.POV_car_L = pygame.image.load("./assets/POV_car_L.png").convert_alpha()
@@ -151,7 +200,15 @@ class Game():
 
         self.lose = False
         self.retry_ok = False
-
+        self.lose_text1 = realText(self.screen,[1280/2,720/4],40)
+        self.lose_text_group1 = pygame.sprite.Group()
+        self.lose_text2 = realText(self.screen,[1280/2,720/2],40)
+        self.lose_text_group2 = pygame.sprite.Group()
+        self.lose_text3 = realText(self.screen,[1280/2,(720*3)/4],40)
+        self.lose_text_group3 = pygame.sprite.Group()
+        self.lose_text_group1.add(self.lose_text1)
+        self.lose_text_group2.add(self.lose_text2)
+        self.lose_text_group3.add(self.lose_text3)
     def update_lane(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -354,6 +411,13 @@ class Game():
         pygame.mixer.music.stop()
         self.channel1.fadeout(100)
         self.screen.blit(self.lose_image,(0,0))
+        self.lose_text_group1.update("HOBBY is when you buy a NEW car")
+        self.lose_text_group1.draw(self.screen)
+        self.lose_text_group2.update("PASSION is when you keep the old one RUNNING")
+        self.lose_text_group2.draw(self.screen)
+        self.lose_text_group3.update("Press enter to retry...")
+        self.lose_text_group3.draw(self.screen)
+        
 
     def run(self):
         if self.lose == True:
@@ -364,31 +428,6 @@ class Game():
             self.draw()
             self.draw_score()
 
-
-class Text(pygame.sprite.Sprite):
-    def __init__(self,screen,message,pos,size,bottom) -> None:
-        super().__init__()
-        self.screen = screen
-        self.pos = pos
-        self.size = size
-        self.bottom = bottom
-        self.original_size = self.size
-        self.color=(200,200,200)
-        self.myFont = pygame.font.Font("./assets/font/TanoheSans-Medium.ttf", self.size)
-        self.message = message
-        self.image = self.myFont.render(self.message, 1, self.color)
-        self.rect = self.image.get_rect()
-        self.rect.center = self.pos
-        
-    def update(self,on):
-        self.rect.center = self.pos
-        if on==True:
-            self.color = (130,115,250)
-        elif on==False:
-            self.color = (70,67,78)
-        if self.bottom == True:
-            self.color = (100,97,108)
-        self.image = self.myFont.render(self.message, 1, self.color)
 
 class GameTitle():
     def __init__(self,screen):
@@ -470,29 +509,6 @@ class GameTitle():
         self.moving_text_group.update(False)
         self.screen.blit(self.title_fog,(0,0))
 
-class realText(pygame.sprite.Sprite):
-    def __init__(self,screen,pos,size) -> None:
-        super().__init__()
-        self.screen = screen
-        self.pos = pos
-        self.size = size
-        self.original_size = self.size
-        self.color=(200,200,200)
-        self.myFont = pygame.font.Font("./assets/font/TanoheSans-Medium.ttf", self.size)
-        self.image = self.myFont.render("_", 1, self.color)
-        self.rect = self.image.get_rect()
-        self.rect.center = self.pos
-        
-    def update(self,message):
-        self.rect = self.image.get_rect()
-        self.rect.center = self.pos
-        # if on==True:
-        #     self.color = (130,115,250)
-        # elif on==False:
-        #     self.color = (70,67,78)
-        # if self.bottom == True:
-        #     self.color = (100,97,108)
-        self.image = self.myFont.render(message, 1, self.color)
 
 class Story():
     def __init__(self,screen):
@@ -545,7 +561,7 @@ class Story():
             ["","It was just like any other peaceful and quiet night in Mr. Mayor's city..."],
             [" ","and the dear subjects who are true and loyal are about sleep. But not before Mr. Mayor finishes talking!"],
             ["Mr. Mayor","Dear my true and loyal subjects if you will."],
-            ["Mr. Mayor","You may spam Space to skip me, but please. I implore you to lend me an ear..."],#INDEX 4
+            ["Mr. Mayor","You may spam space to skip me, but please. I implore you to lend me an ear..."],#INDEX 4
 
             ["Mr. Mayor","As many of you should know, today is my birthday..."],
             ["loyal subjects","mr. mayor, that is so great. happy birthday mr mayor. we appreciate you"],
@@ -736,7 +752,7 @@ while not done_0:
         clock.tick(60)
         pygame.display.update()
 
-challenge = Game(4,screen)
+challenge = Game(4,screen,False)
 while not challenge_done:
     challenge.run()
     clock.tick(60)
@@ -753,14 +769,14 @@ while not intro_done:
     pygame.display.update()
 
 
-tutorial = Game(4,screen)
+tutorial = Game(4,screen,True)
 while not tutorial_done:
     tutorial.run()
     clock.tick(60)
     pygame.display.update()
 
 
-game = Game(4,screen)
+game = Game(4,screen,False)
 while not game_done:
     game.run()
     clock.tick(60)
