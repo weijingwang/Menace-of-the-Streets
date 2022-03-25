@@ -682,6 +682,159 @@ class Story():
         if self.alph_count>=300:
             return(True)
 
+class Ending():
+    def __init__(self,screen):
+        self.screen = screen
+        self.music = "./assets/music/menace of the streets.mp3"
+        self.music_played=True
+        self.music_can_switch =True
+        self.play_music = True
+
+
+        self.sound_car_rev = pygame.mixer.Sound("./assets/sound/car_rev.ogg")
+        self.sound_crash_big = pygame.mixer.Sound("./assets/sound/crash_big.ogg")
+
+
+
+        self.clock = pygame.time.Clock()
+        self.count = 0
+        self.empty = pygame.image.load("./assets/empty.png").convert_alpha()
+        self.evil_twin = pygame.image.load("./assets/evil_twin.png").convert_alpha()
+        self.mayor_twin = pygame.image.load("./assets/mayor_twin.png").convert_alpha()
+        self.lamps = pygame.image.load("./assets/lamps.png").convert_alpha()
+        self.mayor_twin =pygame.transform.scale(self.mayor_twin, (int(720*0.5625), 720))
+        self.evil_twin =pygame.transform.scale(self.evil_twin, (int(720*0.5625), 720))
+
+        self.lamps = pygame.transform.scale(self.lamps, (int(720*0.5625), 720))
+
+
+        self.intro_town0 = pygame.image.load("./assets/end_town0.png").convert_alpha()
+        self.intro_town0 = pygame.transform.scale(self.intro_town0, (1280, 720))
+        self.intro_town = pygame.image.load("./assets/end_town.png").convert_alpha()
+        self.intro_town = pygame.transform.scale(self.intro_town, (3840, 720))
+        self.intro_town_all = [self.intro_town0,self.intro_town0]
+        self.intro_town_pos = [[-1280,0],[0,0],[-3840,0]]
+        self.fibbari_car_pos = [800,340]
+        self.fibbari_car = pygame.image.load("./assets/fibbari_car.png").convert_alpha()
+        self.intro_town_stop = False
+        self.intro_town_done = False
+        self.fib_accel = 2
+
+
+        self.text_bg = pygame.image.load("./assets/text_bg.png").convert_alpha()
+        self.text_bg = pygame.transform.scale(self.text_bg, (1280, int(720/4)))
+        self.speaker_text= realText(self.screen,[1280/2,600],40)
+        self.message_text= realText(self.screen,[1280/2,670],25)
+        self.text_speaker_group = pygame.sprite.Group()
+        self.message_group = pygame.sprite.Group()
+        self.text_speaker_group.add(self.speaker_text)
+        self.message_group.add(self.message_text)
+        self.current_text = [
+            ["TWIN MAYOR","I do believe that I have sufficiently exercised my rights of driving ..."],
+            ["TWIN MAYOR","...as to permanently DAMAGE his public IMAGE into an UNSATISFACTORY mayor and a TERRIBLE person."],#INDEX 1
+            ["TWIN MAYOR","I will make short work of you, mr. mayor."],#INDEX 2
+            ['',''],#index 3
+            ['','']
+        ]
+        self.check_keydown = False
+
+        self.subject1 = self.empty
+        self.subject2 = self.empty
+        self.subject1_pos = [0,0]
+        self.subject2_pos = [0,0]
+
+        self.alphaSurface = pygame.Surface((1280,720))
+        self.alphaSurface.set_alpha(0)
+        self.alph_count = 0
+
+        self.can_crash = True
+
+    def get_input(self):
+        print(self.count)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                # self.intro_town_stop = True
+                self.check_keydown = True
+
+            if event.type == pygame.KEYUP and self.check_keydown == True and self.count<3 and event.key == pygame.K_SPACE:
+                self.count+=1
+                self.check_keydown=False
+            # print(str(self.count)+" is the storty count")
+    def see_city(self):
+        if self.count >= 3:
+            for x in range(0,2):
+                self.intro_town_pos[x][0]+=30
+                if self.intro_town_pos[x][0]>=1280:
+                    self.intro_town_pos[x][0]=1280
+            if self.intro_town_pos[2][0]<=350:
+                self.intro_town_pos[2][0]+=30#-self.intro_town_accel
+            if self.fibbari_car_pos[0]>=550:
+                self.fibbari_car_pos[0]-=3
+
+        else:
+            for x in range(0,2):
+                self.intro_town_pos[x][0]+=10
+                if self.intro_town_pos[x][0]>=1280 and x==0:
+                        self.intro_town_pos[x][0]=-1280
+                elif self.intro_town_pos[x][0]>=1280 and x==1:
+                        self.intro_town_pos[x][0]=-1280
+
+    def update(self):
+        if self.count ==0:
+            self.subject1 = self.evil_twin
+            self.subject2 = self.fibbari_car
+            self.subject1_pos[0]=100
+            self.subject2_pos=self.fibbari_car_pos
+        elif self.count ==3:
+            self.subject1=self.empty
+            if self.intro_town_pos[2][0]>=350 and self.fibbari_car_pos[0]<=550:
+                if self.can_crash==True:
+                    pygame.mixer.Sound.play(self.sound_crash_big)
+                    print("play sound")
+                    self.can_crash=False
+        print(self.intro_town_pos[2][0])
+            # pygame.mixer.music.fadeout(3000)
+            # self.subject1 = self.empty
+            # self.subject2_pos[0]-=5-self.fib_accel
+            # self.fib_accel-=0.1
+            # self.alphaSurface.blit(pygame.transform.scale(self.text_bg,(1280,720)),(0,0))
+            # self.alph_count+=1
+            # self.alphaSurface.set_alpha(self.alph_count)
+
+    def run(self):
+        if self.play_music==True:
+            pygame.mixer.music.load(self.music)
+            pygame.mixer.music.play(-1,0.0)
+            pygame.mixer.music.set_volume(0.75)
+            self.play_music = False
+        self.update()
+        self.get_input()
+        self.see_city()
+        # self.begin()
+        self.screen.blit(self.intro_town_all[0],self.intro_town_pos[0])
+        self.screen.blit(self.intro_town_all[1],self.intro_town_pos[1])
+        self.screen.blit(self.intro_town,self.intro_town_pos[2])
+        # self.screen.blit(self.fibbari_car,self.fibbari_car_pos)
+        # self.screen.blit(self.begin_town,[self.begin_town_pos,0])
+
+
+        self.screen.blit(self.subject1,self.subject1_pos)
+        self.screen.blit(self.subject2,self.subject2_pos)
+
+        self.screen.blit(self.text_bg,(0,720-720/4))
+        self.text_speaker_group.update(self.current_text[self.count][0])
+        self.message_group.update(self.current_text[self.count][1])
+        self.text_speaker_group.draw(self.screen)
+        self.message_group.draw(self.screen)
+        self.screen.blit(self.alphaSurface,(0,0))
+        # self.screen.blit(self.evil_twin,(0,0))
+        # self.clock.tick(60)
+    def intro_finished(self):
+        if self.alph_count>=300:
+            return(True)
+
 pygame.mixer.pre_init()
 pygame.init()
 screen_width = 1280
@@ -750,7 +903,7 @@ while not challenge_done:
     pygame.display.update()
 
 
-intro = Story(screen)
+intro = Ending(screen)
 while not intro_done:
     intro.run()
     if intro.intro_finished() == True:
