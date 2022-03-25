@@ -224,13 +224,13 @@ class Game():
                     self.current_lane-=1
                     self.next_x = self.current_lane*-self.road_width
                     self.move_left = True
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_UP:
                     self.sound_car_rev_loops = -1
                     self.channel1.play(self.sound_car_rev,self.sound_car_rev_loops)
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
                     self.image = self.POV_car_M
-                elif event.key == pygame.K_SPACE:
+                elif event.key == pygame.K_UP:
                     self.channel1.fadeout(100)
                     # self.channel1.stop()
                     self.sound_car_rev_loops = 0
@@ -258,7 +258,6 @@ class Game():
             [self.x+self.road_width*self.lane_array[4][0],self.x+self.road_width*self.lane_array[4][1]],
             [self.x+self.road_width*self.lane_array[5][0],self.x+self.road_width*self.lane_array[5][1]]
         ]
-
     def draw(self):
         if self.play_music==True:
             pygame.mixer.music.load("./assets/music/i drivin and they hatin.mp3")
@@ -294,7 +293,6 @@ class Game():
 
         pygame.draw.rect(self.screen,"black",(0,620,1280,100))
         self.screen.blit(pygame.transform.scale(self.image,(screen_width,screen_height)),(0,0))
-
     def calculate_obstacle_pos(self):
         for x in range(0,6):
             keys = pygame.key.get_pressed()
@@ -315,7 +313,7 @@ class Game():
                     self.channel3.play(self.crash_small)
                     self.lose = True
 
-            if keys[pygame.K_SPACE]:
+            if keys[pygame.K_UP]:
                 self.obst_speed[x] += self.obst_new_accel[x]*5
                 self.obst_new_accel[x]+=0.001
 
@@ -348,7 +346,7 @@ class Game():
                     if self.obst_scale[x]<900 and self.obst_scale[x] >100:# and can_turn_house_on == True:
                         # print("do it now")
                         if (x == 0 and self.current_lane ==1) or (x == 5 and self.current_lane ==4):
-                            if keys[pygame.K_SPACE]:
+                            if keys[pygame.K_UP]:
                                 # print("yes")
                                 if self.obst_can_turn_house_on[x]==1:
                                     self.obst_house_on[x]=1
@@ -356,30 +354,28 @@ class Game():
                                     self.channel2.play(self.sound_elaphant)
                                     # self.channel2.fadeout(0)
                                     self.my_score+=1
-
     def spawn_obstacles(self):
         # print(self.obst_scale)
         current_obstacles = len(self.lane0)+len(self.lane1)+len(self.lane2)+len(self.lane3)+len(self.lane4)+len(self.lane5)
         self.calculate_obstacle_pos()
         self.obst_accel_og+=0.00001
-
-        if current_obstacles == 0:
-            self.the_one_who_will_be_removed = None
-            for x in range(0,6):
-
-                if len(self.lane_occupant[x]) ==0 and random.choice((True,False))==True:
-                    # print(self.obst_pos[x])
-                    test = Obstacle(x,x)
-                    self.obst_is_alive[x]=1
-                    self.lane_occupant[x].add(test)
-                    
-            if len(self.lane_occupant[1]) == 1 and len(self.lane_occupant[2]) == 1 and len(self.lane_occupant[3]) == 1 and len(self.lane_occupant[4]) == 1:
-                self.the_one_who_will_be_removed = random.choice((1,2,3,4))
-        for x in range(0,6):
+        if self.tutorial == True:
             pass
-    # def have_you_lost(self):
-    #     return(self.lose)
-                
+        else:
+            if current_obstacles == 0:
+                self.the_one_who_will_be_removed = None
+                for x in range(0,6):
+
+                    if len(self.lane_occupant[x]) ==0 and random.choice((True,False))==True:
+                        # print(self.obst_pos[x])
+                        test = Obstacle(x,x)
+                        self.obst_is_alive[x]=1
+                        self.lane_occupant[x].add(test)
+                        
+                if len(self.lane_occupant[1]) == 1 and len(self.lane_occupant[2]) == 1 and len(self.lane_occupant[3]) == 1 and len(self.lane_occupant[4]) == 1:
+                    self.the_one_who_will_be_removed = random.choice((1,2,3,4))
+
+     
     def draw_score(self):
         self.scoreText = self.scoreFont.render(str(self.my_score)+" homes disturbed", True,("white"))
         self.screen.blit(self.scoreText,(900,50))
@@ -388,9 +384,9 @@ class Game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 self.retry_ok = True
-            if event.type == pygame.KEYUP and self.retry_ok==True and event.key == pygame.K_RETURN:
+            if event.type == pygame.KEYUP and self.retry_ok==True and event.key == pygame.K_SPACE:
                 self.my_score = 0
                 self.obst_pos = [[1280/2,720/3],[1280/2,720/3],[1280/2,720/3],[1280/2,720/3],[1280/2,720/3],[1280/2,720/3]]
                 self.obst_scale = [0,0,0,0,0,0]
@@ -405,9 +401,6 @@ class Game():
                 self.retry_ok = False
         print(self.retry_ok)
                     
-
-                
-
         pygame.mixer.music.stop()
         self.channel1.fadeout(100)
         self.screen.blit(self.lose_image,(0,0))
@@ -415,7 +408,7 @@ class Game():
         self.lose_text_group1.draw(self.screen)
         self.lose_text_group2.update("PASSION is when you keep the old one RUNNING")
         self.lose_text_group2.draw(self.screen)
-        self.lose_text_group3.update("Press enter to retry...")
+        self.lose_text_group3.update("Press Space to retry...")
         self.lose_text_group3.draw(self.screen)
         
 
@@ -427,7 +420,6 @@ class Game():
             self.spawn_obstacles()
             self.draw()
             self.draw_score()
-
 
 class GameTitle():
     def __init__(self,screen):
@@ -508,7 +500,6 @@ class GameTitle():
         self.moving_text_group.draw(self.screen)
         self.moving_text_group.update(False)
         self.screen.blit(self.title_fog,(0,0))
-
 
 class Story():
     def __init__(self,screen):
