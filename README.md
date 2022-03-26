@@ -6,11 +6,11 @@ Today is Mr. Mayor's birthday today and YOU are invited! But something bad is co
 
 ##Description2
 
-A semi 3d dodging car game with story written in Pygame and Python3.
+A semi 3D car dodging game with an engaging story written in Pygame and Python3.
 
 ##How to play
 
-will tell you in the game but the driving part is **press left or right ONCE to move in direction ONCE**. Press SPACE to **REV** in order to disturb houses as well as go faster.
+will tell you in the game but the driving part is **press left or right ONCE to move in direction ONCE**. Press UP to **REV** in order to disturb houses as well as go faster.
 
 ##How to run game
 
