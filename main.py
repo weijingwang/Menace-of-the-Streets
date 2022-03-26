@@ -313,7 +313,7 @@ class Game():
                 self.obst_is_alive[x]=0
             if self.obst_is_alive[x]:
                 if self.obst_scale[x]>800 and x == self.current_lane:
-                    print("music stopped")
+                    # print("music stopped")
                     self.channel3.play(self.crash_small)
                     self.lose = True
 
@@ -900,7 +900,7 @@ class Ending():
                     self.count+=1
                     self.can_go_next=True
                     self.escape=False
-                    print("set escape to false")
+                    # print("set escape to false")
         elif self.count==13:
             self.subject2=self.lamps
             self.can_go_next=False
