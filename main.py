@@ -264,7 +264,7 @@ class Game():
         ]
     def draw(self):
         if self.play_music==True and self.game_type!=2:
-            pygame.mixer.music.load("./assets/music/i drivin and they hatin.mp3")
+            pygame.mixer.music.load("./assets/music/i-drivin-and-they-hatin.ogg")
             pygame.mixer.music.play(-1,0.0)
             pygame.mixer.music.set_volume(1)
             self.play_music=False
@@ -469,7 +469,7 @@ class GameTitle():
         self.image = pygame.image.load("./assets/title.png").convert_alpha()
         self.title_fog = pygame.image.load("./assets/title_fog.png").convert_alpha()
         self.title_fog = pygame.transform.scale(self.title_fog, (1280, 720))
-        # pygame.mixer.music.load("./assets/music/before the disaster.mp3")
+        # pygame.mixer.music.load("./assets/music/before-the-disaster.ogg")
         # pygame.mixer.music.play(-1,0.0)
         # pygame.mixer.music.set_volume(1)
         self.title_text = Text(self.screen,"Menace of the Street",(1280/2,720-720/5-720/20),100,False)
@@ -546,7 +546,7 @@ class GameTitle():
 class Story():
     def __init__(self,screen):
         self.screen = screen
-        self.music = "./assets/music/before the disaster.mp3"
+        self.music = "./assets/music/before-the-disaster.ogg"
         self.music_played=True
         self.music_can_switch =True
         self.play_music = True
@@ -667,7 +667,7 @@ class Story():
             # pygame.mixer.music.unload()
             # self.music_played=False
             if self.music_can_switch == True:
-                self.music="./assets/music/menace of the streets.mp3"
+                self.music="./assets/music/menace-of-the-streets.ogg"
                 pygame.mixer.music.load(self.music)
                 pygame.mixer.music.play(-1,0.0)
                 pygame.mixer.music.set_volume(0.75)
@@ -720,7 +720,7 @@ class Story():
 class Ending():
     def __init__(self,screen):
         self.screen = screen
-        self.music = "./assets/music/menace of the streets.mp3"
+        self.music = "./assets/music/menace-of-the-streets.ogg"
         
         self.music_played=True
         self.music_can_switch =True
@@ -916,7 +916,7 @@ class Ending():
                     self.can_go_next=True
                     self.escape=False
                     if self.music_can_switch == True:
-                        self.music="./assets/music/before the disaster.mp3"
+                        self.music="./assets/music/before-the-disaster.ogg"
                         pygame.mixer.music.load(self.music)
                         pygame.mixer.music.play(-1,0.0)
                         pygame.mixer.music.set_volume(0.75)
@@ -1007,7 +1007,7 @@ pygame.mixer.pre_init()
 pygame.init()
 screen_width = 1280
 screen_height = 720
-pygame.mixer.music.load("./assets/music/menace of the streets.mp3")
+pygame.mixer.music.load("./assets/music/menace-of-the-streets.ogg")
 pygame.mixer.music.play(-1,0.0)
 pygame.mixer.music.set_volume(1)
 
