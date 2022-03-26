@@ -765,6 +765,7 @@ class Ending():
             ["TWIN MAYOR","Hi Mr. Mayor. I am your twin. I am TWIN MAYOR"],#7
             ["Mr. Mayor","TWIN MAYOR, I will have you pay for the damages you have caused on this night."],
             ["TWIN MAYOR","sorry man I'm broke"],#9
+            ["Press Left to stay. Press Right to flee",""],#10
             ["",""]
         ]
 
@@ -784,6 +785,8 @@ class Ending():
         
         self.done =False
 
+        self.escape = False
+
     def get_input(self):
         # print(self.count)
         for event in pygame.event.get():
@@ -792,6 +795,10 @@ class Ending():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and self.can_go_next==True:
                 # self.intro_town_stop = True
                 self.check_keydown = True
+            if event.type ==pygame.KEYDOWN and self.count==10:
+                if event.key == pygame.K_RIGHT:
+                    self.escape = True
+
 
             if event.type == pygame.KEYUP and self.check_keydown == True and self.count<10 and event.key == pygame.K_SPACE and self.can_go_next==True:
                 self.count+=1
@@ -838,7 +845,10 @@ class Ending():
             self.subject1 = self.mayor_twin
             self.subject2 = self.evil_twin
             self.subject2_pos=[750,0]
-        if self.count ==10:
+        elif self.count ==10 and self.escape==True:
+            if self.subject2_pos[0] <=1280:
+                self.subject2_pos[0]+=40
+        if self.count ==11:
             self.done = True
 
     def run(self):
@@ -903,7 +913,7 @@ game_done = True
 end_done = True
 
 my_title = GameTitle(screen)
-intro = Story(screen)
+intro = Ending(screen)
 challenge = Game(4,screen,0)
 tutorial = Game(4,screen,1)
 game = Game(4,screen,2)
