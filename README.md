@@ -10,11 +10,10 @@ Today is Mr. Mayor's birthday today and YOU are invited! But something bad is co
 Press Left or Right once to move lanes. Press Up to disturb houses and speed up. Press Space to continue. Other more specific controls are said in the game.
 
 ## Requirements
-Python3 and Pygame
-*I used Python 3.8.8 and Pygame 2.0.1*
+Python3 and Pygame (I used Python 3.8.8 and Pygame 2.0.1)
 
 ## How to run
-Please go into the top directory ```Menace-of-the-Streets``` where the README.md and main.py is in. 
+Please go into the top directory ```Menace-of-the-Streets``` where the README.md and main.py is in. <br />
 Then do ```python3 main.py```
 
 
