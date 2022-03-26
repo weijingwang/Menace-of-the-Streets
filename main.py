@@ -409,7 +409,6 @@ class Game():
             self.scoreText = self.scoreFont.render(str(self.my_score)+" homes disturbed", True,("white"))
             self.screen.blit(self.scoreText,(900,50))
 
-
     def go_to_ending(self):
         if self.game_type == 2 and self.my_score >= 5:
             self.channel1.stop()
@@ -421,6 +420,14 @@ class Game():
         return(self.game_done)
 
     def show_lose(self):
+
+        self.screen.blit(self.lose_image,(0,0))
+        self.lose_text_group1.update("HOBBY is when you buy a NEW car")
+        self.lose_text_group1.draw(self.screen)
+        self.lose_text_group2.update("PASSION is when you keep the old one RUNNING")
+        self.lose_text_group2.draw(self.screen)
+        self.lose_text_group3.update("Press Space to retry...")
+        self.lose_text_group3.draw(self.screen)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
@@ -436,23 +443,19 @@ class Game():
                 self.obst_is_alive = [0,0,0,0,0,0]
                 self.obst_house_on = [0,0,0,0,0,0]
                 self.obst_can_turn_house_on = [1,1,1,1,1,1]
-                self.play_music = True
+                # self.play_music = True
+                pygame.mixer.music.unpause()
                 self.lose = False
                 self.retry_ok = False
         # print(self.retry_ok)
                     
         # pygame.mixer.music.stop()
-        self.channel1.fadeout(100)
-        self.screen.blit(self.lose_image,(0,0))
-        self.lose_text_group1.update("HOBBY is when you buy a NEW car")
-        self.lose_text_group1.draw(self.screen)
-        self.lose_text_group2.update("PASSION is when you keep the old one RUNNING")
-        self.lose_text_group2.draw(self.screen)
-        self.lose_text_group3.update("Press Space to retry...")
-        self.lose_text_group3.draw(self.screen)
+
         
     def run(self):
         if self.lose == True:
+            self.channel1.fadeout(100)
+            pygame.mixer.music.pause()
             self.show_lose()
         else:
             self.update_lane()
@@ -726,6 +729,7 @@ class Ending():
 
         self.count = 0
         self.empty = pygame.image.load("./assets/empty.png").convert_alpha()
+        self.jail_img = pygame.image.load("./assets/jail.png").convert_alpha()
         self.evil_twin = pygame.image.load("./assets/evil_twin.png").convert_alpha()
         self.mayor_twin = pygame.image.load("./assets/mayor_twin.png").convert_alpha()
         self.mayor_twin =pygame.transform.scale(self.mayor_twin, (int(720*0.5625), 720))
@@ -750,10 +754,13 @@ class Ending():
         self.text_bg = pygame.transform.scale(self.text_bg, (1280, int(720/4)))
         self.speaker_text= realText(self.screen,[1280/2,600],40)
         self.message_text= realText(self.screen,[1280/2,670],25)
+        self.end_text= realText(self.screen,[1280/2,600],40)
+        self.end_group = pygame.sprite.Group()
         self.text_speaker_group = pygame.sprite.Group()
         self.message_group = pygame.sprite.Group()
         self.text_speaker_group.add(self.speaker_text)
         self.message_group.add(self.message_text)
+        self.end_group.add(self.end_text)
         self.current_text = [
             ["TWIN MAYOR","I do believe that I have sufficiently exercised my rights of driving ..."],
             ["TWIN MAYOR","its time for me to go"],#INDEX 1
@@ -766,7 +773,13 @@ class Ending():
             ["Mr. Mayor","TWIN MAYOR, I will have you pay for the damages you have caused on this night."],
             ["TWIN MAYOR","sorry man I'm broke"],#9
             ["Press Left to stay. Press Right to flee",""],#10
-            ["",""]
+            ["Mr. Mayor","This can’t be happening to me."],#11
+            ["Mr. Mayor","WHY is this happening? Who is to blame?"],
+            ["Mr. Mayor","Make this not happen, and in return I will ____."],
+            ["Mr. Mayor","I’m too sad to do anything."],
+            ["Mr. Mayor","I’m at peace with what happened."],#15
+            ["",""],#16
+            ["",""]#17
         ]
 
         self.check_keydown = False
@@ -786,6 +799,7 @@ class Ending():
         self.done =False
 
         self.escape = False
+        self.jail = False
 
     def get_input(self):
         # print(self.count)
@@ -795,12 +809,14 @@ class Ending():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and self.can_go_next==True:
                 # self.intro_town_stop = True
                 self.check_keydown = True
-            if event.type ==pygame.KEYDOWN and self.count==10:
+            if event.type ==pygame.KEYDOWN and self.count ==10 and self.can_go_next==False:
                 if event.key == pygame.K_RIGHT:
                     self.escape = True
+            if event.type ==pygame.KEYDOWN and self.count ==10 and self.can_go_next==False:
+                if event.key == pygame.K_LEFT:
+                    self.jail = True
 
-
-            if event.type == pygame.KEYUP and self.check_keydown == True and self.count<10 and event.key == pygame.K_SPACE and self.can_go_next==True:
+            if event.type == pygame.KEYUP and self.check_keydown == True and self.count<16 and event.key == pygame.K_SPACE and self.can_go_next==True:
                 self.count+=1
                 self.check_keydown=False
             # print(str(self.count)+" is the storty count")
@@ -845,11 +861,23 @@ class Ending():
             self.subject1 = self.mayor_twin
             self.subject2 = self.evil_twin
             self.subject2_pos=[750,0]
-        elif self.count ==10 and self.escape==True:
-            if self.subject2_pos[0] <=1280:
-                self.subject2_pos[0]+=40
-        if self.count ==11:
+        elif self.count==10:
+            self.can_go_next=False
+            if self.count >=10 and self.escape==True:
+                print("start move")
+                if self.subject2_pos[0] <=1280:
+                    self.subject2_pos[0]+=40
+                if self.subject1_pos[0]<=400:
+                    self.subject1_pos[0]+=5
+                elif self.subject2_pos[0]>=1280 and self.subject1_pos[0]>=400:
+                    print("done moving")
+                    self.count+=1
+                    self.can_go_next=True
+                    self.escape=False
+
+        if self.count ==17:
             self.done = True
+        print(self.can_go_next,str(self.count))
 
     def run(self):
         if self.play_music==True:
@@ -880,6 +908,17 @@ class Ending():
         self.screen.blit(self.alphaSurface,(0,0))
         # self.screen.blit(self.evil_twin,(0,0))
         # self.clock.tick(60)
+        if self.count ==16:
+            self.end_message ='"Grief is a roller coaster"'
+            self.screen.fill("black")
+            self.end_group.update(self.end_message)
+            self.end_group.draw(self.screen)
+        if self.jail == True:
+            self.end_message = "YOU ARE IN JAIL"
+            pygame.mixer.music.fadeout(1000)
+            self.screen.blit(self.jail_img,(0,0))
+            self.end_group.update(self.end_message)
+            self.end_group.draw(self.screen)
     def intro_finished(self):
         return(self.done)
 
@@ -985,7 +1024,3 @@ while not end_done:
         end_done = True
     clock.tick(60)
     pygame.display.update()
-
-        
-
-
