@@ -1026,7 +1026,7 @@ game_done = True
 end_done = True
 
 my_title = GameTitle(screen)
-intro = Ending(screen)
+intro = Story(screen)
 challenge = Game(4,screen,0)
 tutorial = Game(4,screen,1)
 game = Game(4,screen,2)
