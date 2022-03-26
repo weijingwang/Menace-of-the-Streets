@@ -403,14 +403,14 @@ class Game():
             self.screen.blit(self.tutorial_text3,(450,600))
             self.screen.blit(self.tutorial_text4,(400,650))
         elif self.game_type==2:#GAME
-            self.scoreText = self.scoreFont.render(str(self.my_score)+"/5"+" homes disturbed", True,("white"))
+            self.scoreText = self.scoreFont.render(str(self.my_score)+"/13"+" homes disturbed", True,("white"))
             self.screen.blit(self.scoreText,(900,50))
         elif self.game_type==0:#CHALLENGE
             self.scoreText = self.scoreFont.render(str(self.my_score)+" homes disturbed", True,("white"))
             self.screen.blit(self.scoreText,(900,50))
 
     def go_to_ending(self):
-        if self.game_type == 2 and self.my_score >= 5:
+        if self.game_type == 2 and self.my_score >= 13:
             self.channel1.stop()
             self.channel2.stop()
             self.channel3.stop()
@@ -721,6 +721,7 @@ class Ending():
     def __init__(self,screen):
         self.screen = screen
         self.music = "./assets/music/menace of the streets.mp3"
+        
         self.music_played=True
         self.music_can_switch =True
         self.play_music = True
@@ -734,8 +735,10 @@ class Ending():
         self.mayor_twin = pygame.image.load("./assets/mayor_twin.png").convert_alpha()
         self.mayor_twin =pygame.transform.scale(self.mayor_twin, (int(720*0.5625), 720))
         self.evil_twin =pygame.transform.scale(self.evil_twin, (int(720*0.5625), 720))
-
+        self.lamps = pygame.image.load("./assets/lamps.png").convert_alpha()
+        self.lamps = pygame.transform.scale(self.lamps, (int(720*0.5625), 720))
         self.scene1 = pygame.image.load("./assets/e_scene1.png").convert_alpha()
+        self.evidence = pygame.image.load("./assets/evidence.png").convert_alpha()
 
         self.intro_town0 = pygame.image.load("./assets/end_town0.png").convert_alpha()
         self.intro_town0 = pygame.transform.scale(self.intro_town0, (1280, 720))
@@ -773,13 +776,23 @@ class Ending():
             ["Mr. Mayor","TWIN MAYOR, I will have you pay for the damages you have caused on this night."],
             ["TWIN MAYOR","sorry man I'm broke"],#9
             ["Press Left to stay. Press Right to flee",""],#10
-            ["Mr. Mayor","This can’t be happening to me."],#11
-            ["Mr. Mayor","WHY is this happening? Who is to blame?"],
-            ["Mr. Mayor","Make this not happen, and in return I will ____."],
-            ["Mr. Mayor","I’m too sad to do anything."],
-            ["Mr. Mayor","I’m at peace with what happened."],#15
-            ["",""],#16
-            ["",""]#17
+            ["Mr. Mayor","I am at a loss for words..."],#11
+            ["Mr. Mayor","My house is in ruins and TWIN MAYOR has escaped."],
+            ["Mr. Mayor","What am I to do..."],#13
+            ["loyal subjects","Dear Mr. Mayor..."],#14============================================
+            ["loyal subjects","Mr. Mayor, we know that this is a very special day for you..."],
+            ["loyal subjects","...but this does not excuse you for jeapordizing the public peace after quiet hours"],
+            ["Mr. Mayor","What are you talking about my dear loyal and true citizens?"],
+            ["loyal subjects","You see Mr. Mayor, tonight we have recieved multiple reports of a bright red FIBARRI..."],#15
+            ["loyal subjects","This FIBARRI has been harrasing the residents of this city and causing multiple accidents..."],
+            ["loyal subjects","...and we have evidence that the one driving this FIBARRI is you, Mr. Mayor"],#20
+            ["Mr. Mayor","..."],#21
+            ["Mr. Mayor","That is not me! That is TWIN MAYOR! He is my twin and he is a TERRIBLE person."],#22
+            ["Mr. Mayor","I have been framed!"],
+            ["loyal subjects","What a convinient excuse Mr. Mayor. We have photo evidence and the FIBARRI is in your home."],
+            ["loyal subjects","you are coming with us Mr. Mayor..."],#25
+            ["",""],#26
+            ['','']#27
         ]
 
         self.check_keydown = False
@@ -801,6 +814,10 @@ class Ending():
         self.escape = False
         self.jail = False
 
+        self.alphaSurface = pygame.Surface((1280,720))
+        self.alphaSurface.set_alpha(0)
+        self.alph_count = 0
+
     def get_input(self):
         # print(self.count)
         for event in pygame.event.get():
@@ -815,8 +832,11 @@ class Ending():
             if event.type ==pygame.KEYDOWN and self.count ==10 and self.can_go_next==False:
                 if event.key == pygame.K_LEFT:
                     self.jail = True
+            if event.type ==pygame.KEYDOWN and self.count ==13:
+                if event.key == pygame.K_SPACE:
+                    self.escape = True
 
-            if event.type == pygame.KEYUP and self.check_keydown == True and self.count<16 and event.key == pygame.K_SPACE and self.can_go_next==True:
+            if event.type == pygame.KEYUP and self.check_keydown == True and self.count<26 and event.key == pygame.K_SPACE and self.can_go_next==True:
                 self.count+=1
                 self.check_keydown=False
             # print(str(self.count)+" is the storty count")
@@ -874,10 +894,35 @@ class Ending():
                     self.count+=1
                     self.can_go_next=True
                     self.escape=False
+                    print("set escape to false")
+        elif self.count==13:
+            self.subject2=self.lamps
+            self.can_go_next=False
+            if self.count >=13 and self.escape==True:
+                print("start move")
+                if self.subject1_pos[0] >=100:
+                    self.subject1_pos[0]-=5
+                if self.subject2_pos[0]>=700:
+                    self.subject2_pos[0]-=9.66
+                elif self.subject1_pos[0] <=100 and self.subject2_pos[0]<=700:
+                    print("done moving")
+                    self.count+=1
+                    self.can_go_next=True
+                    self.escape=False
+                    if self.music_can_switch == True:
+                        self.music="./assets/music/before the disaster.mp3"
+                        pygame.mixer.music.load(self.music)
+                        pygame.mixer.music.play(-1,0.0)
+                        pygame.mixer.music.set_volume(0.75)
+                        self.music_played=False
 
-        if self.count ==17:
+        # elif self.count==14:
+        #     print("14")
+            
+
+        if self.count ==27:
             self.done = True
-        print(self.can_go_next,str(self.count))
+        print(self.can_go_next,str(self.count),self.escape)
 
     def run(self):
         if self.play_music==True:
@@ -900,6 +945,9 @@ class Ending():
         self.screen.blit(self.subject1,self.subject1_pos)
         self.screen.blit(self.subject2,self.subject2_pos)
 
+        if self.count==20:
+            self.screen.blit(self.evidence,(0,0))
+
         self.screen.blit(self.text_bg,(0,720-720/4))
         self.text_speaker_group.update(self.current_text[self.count][0])
         self.message_group.update(self.current_text[self.count][1])
@@ -908,9 +956,13 @@ class Ending():
         self.screen.blit(self.alphaSurface,(0,0))
         # self.screen.blit(self.evil_twin,(0,0))
         # self.clock.tick(60)
-        if self.count ==16:
-            self.end_message ='"Grief is a roller coaster"'
-            self.screen.fill("black")
+        if self.count ==26:
+            pygame.mixer.music.fadeout(3000)
+            self.alphaSurface.blit(pygame.transform.scale(self.text_bg,(1280,720)),(0,0))
+            self.alph_count+=1
+            self.alphaSurface.set_alpha(self.alph_count)
+            self.end_message ='"Mr. MAYOR IN JAIL DRAW PIC AND DIM TWIN JAIL PIC"'
+            # self.screen.fill("black")
             self.end_group.update(self.end_message)
             self.end_group.draw(self.screen)
         if self.jail == True:
@@ -931,7 +983,7 @@ pygame.mixer.music.play(-1,0.0)
 pygame.mixer.music.set_volume(1)
 
 screen = pygame.display.set_mode((screen_width,screen_height))
-pygame.display.set_caption("pyweek33--Menace of the Streets")
+pygame.display.set_caption("Menace of the Streets (Pyweek33)")
 fibbari_car = pygame.image.load("./assets/fibbari_car.png").convert_alpha()
 fibbari_car = pygame.transform.scale(fibbari_car, (1280, 720))
 stars = pygame.image.load("./assets/stars.png").convert_alpha()
