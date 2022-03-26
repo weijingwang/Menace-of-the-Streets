@@ -963,11 +963,14 @@ class Ending():
         # self.screen.blit(self.evil_twin,(0,0))
         # self.clock.tick(60)
         if self.count ==26:
+            if self.play_jail==True:
+                pygame.mixer.Sound.play(self.sound_jail)
+                self.play_jail =False
             # pygame.mixer.music.fadeout(3000)
             self.alphaSurface.blit(pygame.transform.scale(self.text_bg,(1280,720)),(0,0))
             self.alphaSurface.set_alpha(self.alph_count)
 
-            print(self.alph_count)
+            # print(self.alph_count)
             if self.increase_alph==False:
                 screen.blit(self.jail_mayor_img,(0,0))
                 self.end_message ="Thank you for playing!"
@@ -980,13 +983,17 @@ class Ending():
             if self.alph_count>=300:
                 self.increase_alph =False
             if self.increase_alph==False:
-                self.alph_count-=2
+                if self.alph_count <=0:
+                    self.alph_count=0
+                else:
+                    self.alph_count-=2
 
 
         if self.jail == True:
 
             self.end_message = "YOU ARE IN JAIL"
-            pygame.mixer.music.fadeout(1000)
+            # pygame.mixer.music.fadeout(1000)
+            pygame.mixer.music.stop()
             if self.play_jail==True:
                 pygame.mixer.Sound.play(self.sound_jail)
                 self.play_jail =False
