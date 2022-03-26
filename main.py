@@ -727,10 +727,13 @@ class Ending():
         self.play_music = True
 
         self.sound_crash_big = pygame.mixer.Sound("./assets/sound/crash_big.ogg")
+        self.sound_jail = pygame.mixer.Sound("./assets/sound/jail.ogg")
+
 
         self.count = 0
         self.empty = pygame.image.load("./assets/empty.png").convert_alpha()
         self.jail_img = pygame.image.load("./assets/jail.png").convert_alpha()
+        self.jail_mayor_img = pygame.image.load("./assets/mayor_jail.png").convert_alpha()
         self.evil_twin = pygame.image.load("./assets/evil_twin.png").convert_alpha()
         self.mayor_twin = pygame.image.load("./assets/mayor_twin.png").convert_alpha()
         self.mayor_twin =pygame.transform.scale(self.mayor_twin, (int(720*0.5625), 720))
@@ -817,6 +820,9 @@ class Ending():
         self.alphaSurface = pygame.Surface((1280,720))
         self.alphaSurface.set_alpha(0)
         self.alph_count = 0
+
+        self.play_jail = True
+        self.increase_alph = True
 
     def get_input(self):
         # print(self.count)
@@ -957,17 +963,33 @@ class Ending():
         # self.screen.blit(self.evil_twin,(0,0))
         # self.clock.tick(60)
         if self.count ==26:
-            pygame.mixer.music.fadeout(3000)
+            # pygame.mixer.music.fadeout(3000)
             self.alphaSurface.blit(pygame.transform.scale(self.text_bg,(1280,720)),(0,0))
-            self.alph_count+=1
             self.alphaSurface.set_alpha(self.alph_count)
-            self.end_message ='"Mr. MAYOR IN JAIL DRAW PIC AND DIM TWIN JAIL PIC"'
-            # self.screen.fill("black")
-            self.end_group.update(self.end_message)
-            self.end_group.draw(self.screen)
+
+            print(self.alph_count)
+            if self.increase_alph==False:
+                screen.blit(self.jail_mayor_img,(0,0))
+                self.end_message ="Thank you for playing!"
+                self.end_group.update(self.end_message)
+                self.end_group.draw(self.screen)
+
+            screen.blit(self.alphaSurface,(0,0))
+            if self.alph_count<=300 and self.increase_alph==True:
+                self.alph_count+=2
+            if self.alph_count>=300:
+                self.increase_alph =False
+            if self.increase_alph==False:
+                self.alph_count-=2
+
+
         if self.jail == True:
+
             self.end_message = "YOU ARE IN JAIL"
             pygame.mixer.music.fadeout(1000)
+            if self.play_jail==True:
+                pygame.mixer.Sound.play(self.sound_jail)
+                self.play_jail =False
             self.screen.blit(self.jail_img,(0,0))
             self.end_group.update(self.end_message)
             self.end_group.draw(self.screen)
