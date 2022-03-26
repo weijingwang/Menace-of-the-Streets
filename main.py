@@ -884,13 +884,13 @@ class Ending():
         elif self.count==10:
             self.can_go_next=False
             if self.count >=10 and self.escape==True:
-                print("start move")
+                # print("start move")
                 if self.subject2_pos[0] <=1280:
                     self.subject2_pos[0]+=40
                 if self.subject1_pos[0]<=400:
                     self.subject1_pos[0]+=5
                 elif self.subject2_pos[0]>=1280 and self.subject1_pos[0]>=400:
-                    print("done moving")
+                    # print("done moving")
                     self.count+=1
                     self.can_go_next=True
                     self.escape=False
@@ -899,13 +899,13 @@ class Ending():
             self.subject2=self.lamps
             self.can_go_next=False
             if self.count >=13 and self.escape==True:
-                print("start move")
+                # print("start move")
                 if self.subject1_pos[0] >=100:
                     self.subject1_pos[0]-=5
                 if self.subject2_pos[0]>=700:
                     self.subject2_pos[0]-=9.66
                 elif self.subject1_pos[0] <=100 and self.subject2_pos[0]<=700:
-                    print("done moving")
+                    # print("done moving")
                     self.count+=1
                     self.can_go_next=True
                     self.escape=False
@@ -922,7 +922,7 @@ class Ending():
 
         if self.count ==27:
             self.done = True
-        print(self.can_go_next,str(self.count),self.escape)
+        # print(self.can_go_next,str(self.count),self.escape)
 
     def run(self):
         if self.play_music==True:
