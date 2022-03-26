@@ -1,7 +1,7 @@
 import pygame
 import pygame.gfxdraw
-import os
 import random
+
 class Text(pygame.sprite.Sprite):
     def __init__(self,screen,message,pos,size,bottom) -> None:
         super().__init__()
@@ -551,9 +551,6 @@ class Story():
 
         self.sound_car_rev = pygame.mixer.Sound("./assets/sound/car_rev.ogg")
 
-
-
-        self.clock = pygame.time.Clock()
         self.count = 0
         self.empty = pygame.image.load("./assets/empty.png").convert_alpha()
         self.evil_twin = pygame.image.load("./assets/evil_twin.png").convert_alpha()
@@ -576,7 +573,6 @@ class Story():
         self.intro_town_stop = False
         self.intro_town_done = False
         self.fib_accel = 2
-
 
         self.text_bg = pygame.image.load("./assets/text_bg.png").convert_alpha()
         self.text_bg = pygame.transform.scale(self.text_bg, (1280, int(720/4)))
@@ -651,10 +647,7 @@ class Story():
                         self.intro_town_pos[x][0]=-1280
 
     def update(self):
-        if self.count ==0:
-            print(self.count)
-
-        elif self.count >=1 and self.count <14:
+        if self.count >=1 and self.count <14:
             self.subject1 = self.mayor_twin
             self.subject2 = self.lamps
             self.subject1_pos[0]=self.intro_town_pos[2][0]+100  
@@ -771,7 +764,8 @@ class Ending():
             ["Mr. Mayor","you must pay for this young man! You may not leave"],
             ["TWIN MAYOR","Hi Mr. Mayor. I am your twin. I am TWIN MAYOR"],#7
             ["Mr. Mayor","TWIN MAYOR, I will have you pay for the damages you have caused on this night."],
-            ["TWIN MAYOR","sorry man I'm broke"]#9
+            ["TWIN MAYOR","sorry man I'm broke"],#9
+            ["",""]
         ]
 
         self.check_keydown = False
@@ -787,9 +781,11 @@ class Ending():
 
         self.can_crash = True
         self.can_go_next = True
+        
+        self.done =False
 
     def get_input(self):
-        print(self.count)
+        # print(self.count)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
@@ -797,7 +793,7 @@ class Ending():
                 # self.intro_town_stop = True
                 self.check_keydown = True
 
-            if event.type == pygame.KEYUP and self.check_keydown == True and self.count<9 and event.key == pygame.K_SPACE and self.can_go_next==True:
+            if event.type == pygame.KEYUP and self.check_keydown == True and self.count<10 and event.key == pygame.K_SPACE and self.can_go_next==True:
                 self.count+=1
                 self.check_keydown=False
             # print(str(self.count)+" is the storty count")
@@ -832,7 +828,7 @@ class Ending():
                 if self.can_crash==True:
                     self.can_go_next=True
                     pygame.mixer.Sound.play(self.sound_crash_big)
-                    print("play sound")
+                    # print("play sound")
                     self.intro_town_pos[2][0]=1280
                     self.fibbari_car_pos[0]=-500
                     self.can_crash=False
@@ -842,14 +838,8 @@ class Ending():
             self.subject1 = self.mayor_twin
             self.subject2 = self.evil_twin
             self.subject2_pos=[750,0]
-        # print(self.intro_town_pos[2][0])
-            # pygame.mixer.music.fadeout(3000)
-            # self.subject1 = self.empty
-            # self.subject2_pos[0]-=5-self.fib_accel
-            # self.fib_accel-=0.1
-            # self.alphaSurface.blit(pygame.transform.scale(self.text_bg,(1280,720)),(0,0))
-            # self.alph_count+=1
-            # self.alphaSurface.set_alpha(self.alph_count)
+        if self.count ==10:
+            self.done = True
 
     def run(self):
         if self.play_music==True:
@@ -869,7 +859,6 @@ class Ending():
         # self.screen.blit(self.fibbari_car,self.fibbari_car_pos)
         # self.screen.blit(self.begin_town,[self.begin_town_pos,0])
 
-
         self.screen.blit(self.subject1,self.subject1_pos)
         self.screen.blit(self.subject2,self.subject2_pos)
 
@@ -882,8 +871,7 @@ class Ending():
         # self.screen.blit(self.evil_twin,(0,0))
         # self.clock.tick(60)
     def intro_finished(self):
-        if self.alph_count>=300:
-            return(True)
+        return(self.done)
 
 pygame.mixer.pre_init()
 pygame.init()
@@ -984,7 +972,7 @@ while not game_done:
 while not end_done:
     end.run()
     if end.intro_finished() == True:
-        end = True
+        end_done = True
     clock.tick(60)
     pygame.display.update()
 
