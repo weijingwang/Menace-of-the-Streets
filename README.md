@@ -2,13 +2,16 @@
 
 ## Description
 
-Today is Mr. Mayor's birthday today and YOU are invited! But something bad is coming. Maybe it is his EVIL TWIN...... What will happen?????
+> Today is Mr. Mayor's birthday today and YOU are invited!
+> But something bad is coming. 
+> Maybe it is his EVIL TWIN...... 
+> What will happen?????
 
 "Menace of the Streets" is a semi 3D car dodging game with an engaging story written entirely in Pygame and Python3. This is a game made from scratch by me (speedlimit35) within one week for Pyweek33. I also composed all the music and drew all the art within the week.
 
 ## How to play
 
-The game will tell you in the game but, the driving part is: **press LEFT or RIGHT ONCE to move in direction ONCE**. Press **UP to REV** in order to disturb houses as well as go faster.
+The game will tell you in the game but, the driving part is: **press ```LEFT``` or ```RIGHT``` ONCE to move in direction ONCE**. Press **```UP``` to REV** in order to disturb houses as well as go faster.
 
 ## How to run game
 
